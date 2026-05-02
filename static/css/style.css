@@ -1,0 +1,4 @@
+/* إعدادات النعومة والزجاجيات للنظام بالكامل */
+body { transition: background-color 0.3s, color 0.3s; }
+.glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); }
+.dark .glass-panel { background: rgba(30, 41, 59, 0.7); }

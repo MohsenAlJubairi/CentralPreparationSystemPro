@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block title %}لوحة التحكم - السكن الطلابي{% endblock %}
+
+{% block header_title %}
+    مرحباً بك، {{ current_user.name }} 👋 
+    <span class="text-sm font-normal text-slate-500 mr-2">(ملخص وإحصائيات التحضير لليوم)</span>
+{% endblock %}
+
+{% block content %}
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div class="glass-panel p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">الطلاب الفعليون</p>
+                <h3 class="text-2xl font-bold">{{ total_students }}</h3>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-users"></i>
+            </div>
+        </div>
+        
+        <div class="glass-panel p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">حاضرون اليوم</p>
+                <h3 class="text-2xl font-bold text-emerald-600">{{ present_count }}</h3>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-check"></i>
+            </div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">غائبون اليوم</p>
+                <h3 class="text-2xl font-bold text-rose-600">{{ absent_count }}</h3>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">مستأذنون اليوم</p>
+                <h3 class="text-2xl font-bold text-amber-500">{{ excused_count }}</h3>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-500 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+        </div>
+
+        <div class="glass-panel p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">في إجازة</p>
+                <h3 class="text-2xl font-bold text-purple-600">{{ leave_count }}</h3>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-plane"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4 flex flex-wrap gap-3 items-center">
+        <form action="{{ url_for('toggle_date_change') }}" method="POST" class="inline-block">
+            <button type="submit" class="px-5 py-2.5 rounded-xl font-bold shadow-sm transition flex items-center gap-2
+                {% if allow_date_change %} bg-rose-100 text-rose-700 hover:bg-rose-200 border border-rose-200
+                {% else %} bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border border-emerald-200 {% endif %}">
+                {% if allow_date_change %}
+                    <i class="fa-solid fa-lock"></i> إغلاق صلاحية تغيير التاريخ
+                {% else %}
+                    <i class="fa-solid fa-calendar-day"></i> السماح بتغيير التاريخ
+                {% endif %}
+            </button>
+        </form>
+
+        <button onclick="exportTableToExcel()" class="px-5 py-2.5 rounded-xl font-bold shadow-sm transition bg-green-600 text-white hover:bg-green-700 flex items-center gap-2">
+            <i class="fa-solid fa-file-excel"></i> تصدير إلى Excel
+        </button>
+    </div>
+
+    <form method="GET" action="{{ url_for('admin_dashboard') }}" class="mb-6 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <h4 class="font-bold text-slate-700 dark:text-slate-300 mb-4"><i class="fa-solid fa-filter ml-2 text-primary"></i>تصفية كشف التحضير</h4>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">من تاريخ</label>
+                <input type="date" name="start_date" value="{{ selected_start or '' }}" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg p-2 text-sm outline-none font-bold">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">إلى تاريخ</label>
+                <input type="date" name="end_date" value="{{ selected_end or '' }}" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg p-2 text-sm outline-none font-bold">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">حالة الحضور</label>
+                <select name="status" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg p-2 text-sm outline-none font-bold">
+                    <option value="all" {% if selected_status == 'all' %}selected{% endif %}>الكل</option>
+                    <option value="حاضر" {% if selected_status == 'حاضر' %}selected{% endif %} class="text-emerald-600">حاضر</option>
+                    <option value="غائب" {% if selected_status == 'غائب' %}selected{% endif %} class="text-rose-600">غائب</option>
+                    <option value="مستأذن" {% if selected_status == 'مستأذن' %}selected{% endif %} class="text-amber-500">مستأذن</option>
+                    <option value="مأجز" {% if selected_status == 'مأجز' %}selected{% endif %} class="text-purple-500">مأجز</option>
+                </select>
+            </div>
+            <div class="flex items-end gap-2">
+                <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-blue-600 transition shadow-sm">تطبيق الفلتر</button>
+                <a href="{{ url_for('admin_dashboard') }}" title="إلغاء الفلاتر" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-lg text-sm font-bold hover:bg-rose-500 hover:text-white transition shadow-sm text-center">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5 pt-4 border-t border-slate-100 dark:border-slate-700">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-2">الشقق (يمكن اختيار أكثر من شقة)</label>
+                <div class="flex flex-wrap gap-2">
+                    {% for i in range(2, 13) %}
+                    <label class="inline-flex items-center bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md px-3 py-1.5 text-xs font-bold cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition has-[:checked]:bg-blue-100 has-[:checked]:border-blue-500 has-[:checked]:text-blue-800 dark:has-[:checked]:bg-blue-900/50 dark:has-[:checked]:text-blue-300">
+                        <input type="checkbox" name="apartments" value="{{ i }}" class="hidden" {% if i|string in selected_apts %}checked{% endif %}>
+                        {{ i }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 mb-2">الغرف (يمكن اختيار أكثر من غرفة)</label>
+                <div class="flex flex-wrap gap-2">
+                    {% for i in range(1, 6) %}
+                    <label class="inline-flex items-center bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md px-3 py-1.5 text-xs font-bold cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition has-[:checked]:bg-blue-100 has-[:checked]:border-blue-500 has-[:checked]:text-blue-800 dark:has-[:checked]:bg-blue-900/50 dark:has-[:checked]:text-blue-300">
+                        <input type="checkbox" name="rooms" value="{{ i }}" class="hidden" {% if i|string in selected_rooms %}checked{% endif %}>
+                        {{ i }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </form>
+    
+    <div class="glass-panel rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col mt-8">
+        <div class="p-4 border-b border-slate-200 bg-white/50 flex justify-between items-center">
+             <h3 class="font-bold text-slate-700"><i class="fa-solid fa-calendar-days ml-2"></i>سجل التحضير الشامل</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table id="attendanceTable" class="w-full border-collapse text-right">
+                <thead class="bg-slate-50 text-slate-500 text-sm">
+                    <tr>
+                        <th class="p-4 font-bold border-b w-1/3 text-right">اسم الطالب</th>
+                        <th class="p-4 font-bold border-b text-center whitespace-nowrap">الشقة</th>
+                        <th class="p-4 font-bold border-b text-center whitespace-nowrap">الغرفة</th>
+                        {% for d in dates %}
+                            <th class="p-4 font-bold border-b text-center whitespace-nowrap">{{ d.strftime('%m-%d') }}</th>
+                        {% else %}
+                            <th class="p-4 font-bold border-b text-center">لم يتم التحضير بعد</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    {% if not dates %}
+                        <tr><td colspan="4" class="p-8 text-center text-slate-500 font-bold">لا توجد بيانات تحضير في النظام حتى الآن.</td></tr>
+                    {% else %}
+                        {% for student in students %}
+                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                            <td class="p-4 font-bold text-right">{{ student.full_name }}</td>
+                            <td class="p-4 text-center">
+                                <span class="bg-slate-200 px-3 py-1 rounded-md text-xs font-bold whitespace-nowrap text-slate-700">{{ student.apartment_number }}</span>
+                            </td>
+                            <td class="p-4 text-center text-slate-500 font-bold whitespace-nowrap">{{ student.room_number }}</td>
+                            
+                            <!-- بداية عرض الحضور -->
+                            {% for d in dates %}
+                                {% set status = att_dict.get(student.id, {}).get(d) %}
+                                {% set note = att_dict_notes.get(student.id, {}).get(d) %}
+                                
+                                <!-- 1. إضافة relative group للخلية لكي يعمل التلميح -->
+                                <td class="p-4 text-center relative group">
+                                    {% if status %} <!-- 2. التحقق من وجود حالة تحضير أولاً -->
+                                        <div class="inline-block relative"> <!-- حاوية الأيقونة والنقطة النابضة -->
+                                            
+                                            {% if status == 'حاضر' %}
+                                                <i class="fa-solid fa-check text-emerald-500 text-lg" title="حاضر"></i>
+                                            {% elif status == 'غائب' %}
+                                                <i class="fa-solid fa-xmark text-rose-500 text-lg" title="غائب"></i>
+                                            {% elif status == 'مستأذن' %}
+                                                <i class="fa-solid fa-clock text-amber-500 text-lg" title="مستأذن"></i>
+                                            {% elif status == 'مأجز' %}
+                                                <i class="fa-solid fa-plane text-purple-500 text-lg" title="مأجز"></i>
+                                            {% endif %}
+
+                                            {% if note %}
+                                                <!-- النقطة النابضة -->
+                                                <span class="absolute -top-1 -right-2 w-2.5 h-2.5 bg-rose-500 rounded-full border border-white animate-pulse"></span>
+                                                
+                                                <!-- مربع التلميح (يظهر فقط عند تمرير الماوس) -->
+                                                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-[200px] bg-slate-800 text-white text-xs font-bold p-2 rounded-lg shadow-xl z-50 whitespace-normal text-right">
+                                                    {{ note }}
+                                                    <!-- السهم الصغير -->
+                                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                                                </div>
+                                            {% endif %}
+                                            
+                                        </div>
+                                    {% else %}
+                                        <span class="text-slate-300">-</span>
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+    function exportTableToExcel() {
+        let table = document.getElementById("attendanceTable");
+        let wb = XLSX.utils.book_new();
+        let ws_data = [];
+
+        // المرور على جميع صفوف الجدول
+        for (let i = 0; i < table.rows.length; i++) {
+            let row = table.rows[i];
+            let rowData = [];
+            
+            for (let j = 0; j < row.cells.length; j++) {
+                let cell = row.cells[j];
+                
+                // البحث عن أيقونة داخل الخلية
+                let icon = cell.querySelector('i');
+                let span = cell.querySelector('span'); // للقراءة من الأشرطة (badges)
+                
+                if (icon && icon.getAttribute('title')) {
+                    // إذا كانت أيقونة (حاضر، غائب...)، نأخذ النص من title
+                    rowData.push(icon.getAttribute('title'));
+                } else if (span && span.innerText.trim() !== "") {
+                    // إذا كان span (مثل رقم الشقة)، نأخذ نصه
+                    rowData.push(span.innerText.trim());
+                } else {
+                    // غير ذلك (مثل الاسم والتاريخ)، نأخذ النص العادي للخلية
+                    rowData.push(cell.innerText.trim());
+                }
+            }
+            ws_data.push(rowData);
+        }
+
+        // إنشاء ورقة العمل وتنزيل الملف
+        let ws = XLSX.utils.aoa_to_sheet(ws_data);
+        
+        // تنسيق اتجاه الورقة من اليمين لليسار
+        if(!ws['!dir']) ws['!dir'] = 'rtl';
+
+        XLSX.utils.book_append_sheet(wb, ws, "سجل التحضير");
+        
+        // جلب التاريخ الحالي لتسمية الملف
+        let today = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(wb, `سجل_التحضير_${today}.xlsx`);
+    }
+</script>
+{% endblock %}

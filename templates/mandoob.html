@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة المندوب - التحضير اليومي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        .welcome-text h1 { color: #2c3e50; margin: 0 0 5px 0; font-size: 24px; }
+        .welcome-text p { color: #7f8c8d; margin: 0; font-size: 16px; }
+        .logout-btn { color: #e74c3c; text-decoration: none; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-top: 10px; }
+        
+        .time-badge { background: #e8f4f8; color: #2980b9; padding: 10px 15px; border-radius: 8px; font-weight: bold; text-align: center; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #eee; }
+        th { background-color: #f8f9fa; color: #2c3e50; font-size: 15px; }
+        tr:hover { background-color: #fcfcfc; }
+        
+        /* تنسيق أزرار الحضور */
+        .status-options { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; }
+        .status-options label { cursor: pointer; padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd; transition: 0.3s; font-weight: bold; font-size: 14px; color: #555; background: #fff;}
+        .status-options input[type="radio"] { display: none; }
+        
+        /* ألوان الحالات عند التحديد */
+        .status-options input[value="حاضر"]:checked + label { background-color: #2ecc71; color: white; border-color: #2ecc71; }
+        .status-options input[value="غائب"]:checked + label { background-color: #e74c3c; color: white; border-color: #e74c3c; }
+        .status-options input[value="مستأذن"]:checked + label { background-color: #f1c40f; color: white; border-color: #f1c40f; }
+        .status-options input[value="مأجز"]:checked + label { background-color: #9b59b6; color: white; border-color: #9b59b6; }
+        
+        .submit-btn { display: block; width: 100%; padding: 15px; background-color: #34495e; color: white; border: none; border-radius: 8px; font-size: 18px; font-family: inherit; font-weight: bold; margin-top: 30px; cursor: pointer; transition: 0.3s; }
+        .submit-btn:hover { background-color: #2c3e50; }
+        
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; }
+        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        
+        .done-message { text-align: center; padding: 40px 20px; background-color: #f8f9fa; border-radius: 12px; margin-top: 20px; }
+        .done-message i { font-size: 50px; color: #2ecc71; margin-bottom: 15px; }
+        .edit-btn { display: inline-block; margin-top: 20px; padding: 12px 25px; background-color: #2980b9; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; font-family: inherit; }
+        .edit-btn:hover { background-color: #3498db; }
+        
+        .date-input-container { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; }
+        .date-input-container input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-weight: bold; }
+
+        /* تنسيقات حقل الملاحظة الجديد */
+        .note-btn { background: none; border: none; color: #3498db; cursor: pointer; font-size: 20px; transition: 0.2s; margin-right: 5px; }
+        .note-btn:hover { color: #2980b9; transform: scale(1.1); }
+        .note-input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: inherit; margin-top: 10px; background: #fdfdfd; box-sizing: border-box; }
+        .note-input:focus { border-color: #3498db; outline: none; }
+        .note-display { font-size: 12px; color: #3498db; margin-top: 5px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {% if category == 'success' %}alert-success{% else %}alert-error{% endif %}">
+              {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="header">
+        <div class="welcome-text">
+            <h1>مرحباً، {{ current_user.name }} 👋</h1>
+            <p>مندوب شقة ({{ apt_num }})</p>
+            <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> تسجيل الخروج</a>
+        </div>
+        <div class="time-badge">
+            <div id="current-date">{{ today.strftime('%Y-%m-%d') }}</div>
+            <div id="clock">00:00:00</div>
+        </div>
+    </div>
+
+    {% if already_recorded %}
+        <div id="doneSection" class="done-message">
+            <i class="fa-solid fa-clipboard-check"></i>
+            <h2>تم إرسال التحضير!</h2>
+            <p>شكراً لك، لقد تم حفظ كشف التحضير بنجاح.</p>
+            <button type="button" onclick="showEditForm()" class="edit-btn"><i class="fa-solid fa-pen"></i> تعديل التحضير</button>
+        </div>
+    {% endif %}
+
+    <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %}>
+        
+        {% if allow_date_change %}
+            <div class="date-input-container">
+                <span><i class="fa-solid fa-triangle-exclamation"></i> تم تفعيل وضع تعديل التاريخ</span>
+                <input type="date" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}">
+            </div>
+        {% else %}
+            <input type="hidden" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}">
+        {% endif %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">م</th>
+                    <th style="width: 35%;">اسم الطالب</th>
+                    <th style="text-align: center; width: 10%;">الغرفة</th>
+                    <th style="text-align: center; width: 50%;">حالة الحضور</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- بداية حلقة التكرار للطلاب -->
+                {% for student in students %}
+                
+                {% set db_status = att_dict.get(student.id) %}
+                {% if db_status %}
+                    {% set current_status = db_status %}
+                {% elif student.status == 'في إجازة' %}
+                    {% set current_status = 'مأجز' %}
+                {% else %}
+                    {% set current_status = 'حاضر' %}
+                {% endif %}
+
+                <tr>
+                    <td style="font-weight: bold; color: #7f8c8d;">{{ loop.index }}</td>
+                    
+                    <td>
+                        <strong style="font-size: 15px; color: #2c3e50;">{{ student.full_name }}</strong>
+                        <!-- عرض الملاحظة القديمة إن وجدت أسفل اسم الطالب -->
+                        {% if att_dict_notes and att_dict_notes.get(student.id) %}
+                        <div id="note_display_{{ student.id }}" class="note-display">
+                            <i class="fa-solid fa-comment-dots"></i> {{ att_dict_notes.get(student.id) }}
+                        </div>
+                        {% endif %}
+                    </td>
+                    
+                    <td style="text-align: center; font-weight: bold; color: #7f8c8d; font-size: 16px;">
+                        {{ student.room_number }}
+                    </td>
+                    
+                    <td>
+                        <div class="status-options">
+                            <input type="radio" id="present_{{ student.id }}" name="student_{{ student.id }}" value="حاضر" required {% if current_status == 'حاضر' %}checked{% endif %}>
+                            <label for="present_{{ student.id }}">حاضر</label>
+                            
+                            <input type="radio" id="absent_{{ student.id }}" name="student_{{ student.id }}" value="غائب" required {% if current_status == 'غائب' %}checked{% endif %}>
+                            <label for="absent_{{ student.id }}">غائب</label>
+                            
+                            <input type="radio" id="excused_{{ student.id }}" name="student_{{ student.id }}" value="مستأذن" required {% if current_status == 'مستأذن' %}checked{% endif %}>
+                            <label for="excused_{{ student.id }}">مستأذن</label>
+                            
+                            <input type="radio" id="leave_{{ student.id }}" name="student_{{ student.id }}" value="مأجز" required {% if current_status == 'مأجز' %}checked{% endif %}>
+                            <label for="leave_{{ student.id }}">مأجز</label>
+
+                            <!-- زر أيقونة إضافة الملاحظة -->
+                            <button type="button" onclick="toggleNote('{{ student.id }}')" class="note-btn" title="إضافة/تعديل ملاحظة">
+                                <i class="fa-regular fa-comment-dots"></i>
+                            </button>
+                        </div>
+
+                        <!-- حقل الملاحظة المخفي (يظهر عند الضغط على الأيقونة) -->
+                        <div id="note_container_{{ student.id }}" style="display: none;">
+                            <input type="text" name="note_{{ student.id }}" 
+                                value="{{ att_dict_notes.get(student.id, '') if att_dict_notes else '' }}"
+                                placeholder="اكتب ملاحظة قصيرة (اختياري)..." 
+                                class="note-input">
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <!-- نهاية حلقة التكرار -->
+            </tbody>
+        </table>
+
+        <button type="submit" class="submit-btn"><i class="fa-solid fa-paper-plane"></i> إرسال واعتماد التحضير</button>
+    </form>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString('ar-SA');
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function showEditForm() {
+        document.getElementById('doneSection').style.display = 'none';
+        document.getElementById('attendanceForm').style.display = 'block';
+    }
+
+    // دالة إظهار وإخفاء حقل الملاحظة
+    function toggleNote(studentId) {
+        const container = document.getElementById('note_container_' + studentId);
+        if (container.style.display === 'none' || container.style.display === '') {
+            container.style.display = 'block';
+            container.querySelector('input').focus(); // التركيز على الحقل مباشرة للكتابة
+        } else {
+            container.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>

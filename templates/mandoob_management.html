@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}إدارة المناديب{% endblock %}
+
+{% block header_title %}إدارة حسابات المناديب <span class="text-sm font-normal text-slate-500">(التحكم بالصلاحيات)</span>{% endblock %}
+
+{% block content %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">إجمالي الحسابات</p>
+                <h3 class="text-2xl font-bold">{{ mandoobs|length }}</h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl"><i class="fa-solid fa-id-card"></i></div>
+        </div>
+        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">مناديب نشطون</p>
+                <h3 class="text-2xl font-bold text-emerald-600">
+                    {{ mandoobs|selectattr('is_active', 'equalto', True)|list|length }}
+                </h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl"><i class="fa-solid fa-user-check"></i></div>
+        </div>
+        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <p class="text-slate-500 text-xs font-bold mb-1">حسابات معطلة</p>
+                <h3 class="text-2xl font-bold text-rose-600">
+                    {{ mandoobs|selectattr('is_active', 'equalto', False)|list|length }}
+                </h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl"><i class="fa-solid fa-user-slash"></i></div>
+        </div>
+    </div>
+
+    <div class="glass-panel rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h3 class="font-bold text-lg text-slate-800">قائمة المناديب</h3>
+            
+            <div class="flex gap-3 w-full md:w-auto">
+                <select id="statusFilter" class="bg-white border border-slate-200 rounded-xl py-2 px-4 text-sm outline-none focus:border-primary font-bold text-slate-600 shadow-sm">
+                    <option value="active" selected>النشطون فقط</option>
+                    <option value="inactive">المعطلون فقط</option>
+                    <option value="all">عرض الكل</option>
+                </select>
+                
+                <div class="relative flex-1 md:w-64">
+                    <input type="text" id="mandoobSearch" placeholder="بحث باسم المندوب..." class="w-full bg-white border border-slate-200 rounded-xl py-2 pr-10 pl-4 text-sm outline-none focus:border-primary shadow-sm">
+                    <i class="fa-solid fa-search absolute right-3 top-2.5 text-slate-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-right border-separate border-spacing-y-2 px-6">
+                <thead>
+                    <tr class="text-slate-400 text-sm">
+                        <th class="p-4 font-medium">المندوب</th>
+                        <th class="p-4 font-medium">اسم المستخدم</th>
+                        <th class="p-4 font-medium">الشقة الحالية</th>
+                        <th class="p-4 font-medium">الحالة</th>
+                        <th class="p-4 font-medium text-center">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="mandoobTableBody">
+                    {% for mandoob in mandoobs %}
+                    <tr class="bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-2xl hover:bg-slate-50 transition mandoob-row" 
+                        data-name="{{ mandoob.name }}" 
+                        data-active="{{ 'true' if mandoob.is_active else 'false' }}">
+                        
+                        <td class="p-4 font-bold rounded-r-2xl">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 uppercase">{{ mandoob.name[0] }}</div>
+                                <span>{{ mandoob.name }}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 text-slate-500 font-mono text-sm" dir="ltr">{{ mandoob.username }}</td>
+                        <td class="p-4">
+                            {% if mandoob.student %}
+                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">شقة {{ mandoob.student.apartment_number }}</span>
+                            {% else %}
+                                <span class="text-slate-400 text-xs italic">غير مرتبط بشقة</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4">
+                            {% if mandoob.is_active %}
+                                <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200">نشط</span>
+                            {% else %}
+                                <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs font-bold border border-rose-200">معطل</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4 rounded-l-2xl text-center">
+                            <div class="flex justify-center gap-2">
+                                <button type="button" 
+                                        data-id="{{ mandoob.id }}" 
+                                        data-name="{{ mandoob.name }}"
+                                        onclick="openPasswordModal(this)" 
+                                        title="تغيير كلمة المرور"
+                                        class="px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white">
+                                    <i class="fa-solid fa-key"></i>
+                                </button>
+                                
+                                <a href="{{ url_for('toggle_mandoob', user_id=mandoob.id) }}" 
+                                   class="px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm
+                                   {% if mandoob.is_active %}bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white{% else %}bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white{% endif %}">
+                                     {% if mandoob.is_active %}<i class="fa-solid fa-power-off ml-1"></i> تعطيل{% else %}<i class="fa-solid fa-check ml-1"></i> تفعيل{% endif %}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="resetPasswordModal" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-slate-200 flex justify-between">
+                <h3 class="font-bold text-lg text-primary">تغيير كلمة المرور</h3>
+                <button onclick="closePasswordModal()" class="text-rose-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="resetPasswordForm" method="POST" class="p-6 space-y-5">
+                <div>
+                    <p class="text-sm text-slate-500 mb-4">تعيين كلمة مرور جديدة للمندوب: <strong id="modalUserName" class="text-slate-800"></strong></p>
+                    <label class="block text-sm font-bold mb-2 text-slate-700">كلمة المرور الجديدة</label>
+                    <input type="text" name="new_password" required minlength="6" placeholder="أدخل 6 أحرف على الأقل..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary transition font-mono">
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-primary hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-blue-200/50">حفظ وتشفير</button>
+                    <button type="button" onclick="closePasswordModal()" class="flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 py-3 rounded-xl font-bold transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterTable() {
+        let searchQuery = document.getElementById('mandoobSearch').value.toLowerCase();
+        let statusFilter = document.getElementById('statusFilter').value;
+        
+        document.querySelectorAll('.mandoob-row').forEach(row => {
+            let name = row.getAttribute('data-name').toLowerCase();
+            let isActive = row.getAttribute('data-active');
+            
+            let matchesSearch = name.includes(searchQuery);
+            let matchesStatus = true;
+            
+            if (statusFilter === 'active' && isActive === 'false') matchesStatus = false;
+            if (statusFilter === 'inactive' && isActive === 'true') matchesStatus = false;
+            
+            row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+        });
+    }
+
+    document.getElementById('mandoobSearch').addEventListener('keyup', filterTable);
+    document.getElementById('statusFilter').addEventListener('change', filterTable);
+    document.addEventListener('DOMContentLoaded', filterTable);
+
+    // دوال النافذة المنبثقة
+    function openPasswordModal(userId, userName) {
+        document.getElementById('resetPasswordForm').action = '/reset_password/' + userId;
+        document.getElementById('modalUserName').innerText = userName;
+        document.getElementById('resetPasswordModal').classList.remove('hidden');
+        document.getElementById('resetPasswordModal').classList.add('flex');
+    }
+
+    function openPasswordModal(element) {
+        // جلب البيانات من الزر نفسه بطريقة آمنة لا تزعج المحرر
+        let userId = element.getAttribute('data-id');
+        let userName = element.getAttribute('data-name');
+        
+        document.getElementById('resetPasswordForm').action = '/reset_password/' + userId;
+        document.getElementById('modalUserName').innerText = userName;
+        document.getElementById('resetPasswordModal').classList.remove('hidden');
+        document.getElementById('resetPasswordModal').classList.add('flex');
+    }
+</script>
+{% endblock %}
