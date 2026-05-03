@@ -31,12 +31,12 @@ register_routes(app)
 with app.app_context():
     #db.drop_all()  # فك التعليق عن هذا السطر لمرة واحدة فقط لمسح الجداول القديمة
     db.create_all()
-    # if not User.query.filter_by(username='admin').first():
-    #     hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
-    #     new_admin = User(username='admin', password=hashed_password, role='admin')
-    #     db.session.add(new_admin)
-    #     db.session.commit()
-    #     print("✅ تم إنشاء حساب مدير افتراضي بنجاح!")
+    if not User.query.filter_by(username='admin').first():
+        hashed_password = generate_password_hash('admin123', method='pbkdf2:sha256')
+        new_admin = User(username='admin', password=hashed_password, role='admin')
+        db.session.add(new_admin)
+        db.session.commit()
+        print("✅ تم إنشاء حساب مدير افتراضي بنجاح!")
 
 if __name__ == '__main__':
     app.run(debug=False)
