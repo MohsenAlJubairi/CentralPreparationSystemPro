@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import db, User, Student, Attendance
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from urllib.parse import urlparse, urljoin
 from sqlalchemy.exc import IntegrityError
@@ -537,17 +537,12 @@ def register_routes(app):
     @app.route('/mandoob')
     @login_required
     def mandoob_dashboard():
-        if current_user.role == 'developer':
-            return redirect(url_for('manage_admins'))
-        if current_user.role == 'admin':
-            return redirect(url_for('admin_dashboard'))
-
-        if current_user.role != 'mandoob':
-            return redirect(url_for('login'))
+        if current_user.role == 'developer': return redirect(url_for('manage_admins'))
+        if current_user.role == 'admin': return redirect(url_for('admin_dashboard'))
+        if current_user.role != 'mandoob': return redirect(url_for('login'))
         
         mandoob_student = current_user.student
-        if not mandoob_student:
-            return "حسابك غير مرتبط بأي شقة حالياً.", 400
+        if not mandoob_student: return "حسابك غير مرتبط بأي شقة حالياً.", 400
             
         apt_num = mandoob_student.apartment_number
         students = Student.query.filter(
@@ -555,7 +550,16 @@ def register_routes(app):
             Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])
         ).order_by(Student.room_number).all()
         
+        # حساب توقيت اليمن (UTC+3)
+        yemen_tz = timezone(timedelta(hours=3))
+        now_in_yemen = datetime.now(yemen_tz)
+        current_hour = now_in_yemen.hour
+        
+        # التحقق من الوقت: أكبر من أو يساوي 18 (6 مساءً) -- أو -- أصغر من 3 (3 فجراً)
+        is_allowed_time = (current_hour >= 18) or (current_hour < 3)
+        
         today = date.today()
+        logical_today = (now_in_yemen - timedelta(hours=3)).date()
         existing_records = Attendance.query.filter_by(recorded_by=current_user.id, date=today).all()
         att_dict = {r.student_id: r.status for r in existing_records}
         
@@ -568,15 +572,34 @@ def register_routes(app):
                                already_recorded=already_recorded,
                                att_dict=att_dict,
                                today=today,
-                               allow_date_change=allow_date)
+                               allow_date_change=allow_date,
+                               is_allowed_time=is_allowed_time) # تمرير حالة الوقت للواجهة
+
+
 
     @app.route('/submit_attendance', methods=['POST'])
     @login_required
     def submit_attendance():
-        if current_user.role != 'mandoob':
-            return redirect(url_for('login'))
+
+        if current_user.role != 'mandoob': return redirect(url_for('login'))
+        
+        allow_date = get_setting('ALLOW_DATE_CHANGE', False)
+        
+        # حماية الباك إند: التحقق من الوقت مرة أخرى لمنع التلاعب
+        yemen_tz = timezone(timedelta(hours=3))
+        now_in_yemen = datetime.now(yemen_tz)
+        current_hour = now_in_yemen.hour
+        is_allowed_time = (current_hour >= 18) or (current_hour < 3)
+        
+        # إذا لم يكن الوقت مسموحاً، ولم يقم الإداري بفتح صلاحية تغيير التاريخ
+        if not is_allowed_time and not allow_date:
+            flash('عذراً، وقت التحضير متاح فقط من الساعة 6:00 مساءً وحتى 3:00 فجراً.', 'error')
+            return redirect(url_for('mandoob_dashboard'))
             
-        from datetime import datetime
+        # 🌟 حساب التاريخ المنطقي للحفظ 🌟
+        logical_today = (now_in_yemen - timedelta(hours=3)).date()
+
+        today = date.today()
         record_date_str = request.form.get('record_date')
         record_date = datetime.strptime(record_date_str, '%Y-%m-%d').date() if record_date_str else date.today()
         

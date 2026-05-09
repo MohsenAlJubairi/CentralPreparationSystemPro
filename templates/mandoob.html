@@ -4,115 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة المندوب - التحضير اليومي</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Tajawal', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
-        .welcome-text h1 { color: #2c3e50; margin: 0 0 5px 0; font-size: 24px; }
-        .welcome-text p { color: #7f8c8d; margin: 0; font-size: 16px; }
-        .logout-btn { color: #e74c3c; text-decoration: none; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-top: 10px; }
-        
-        .time-badge { background: #e8f4f8; color: #2980b9; padding: 10px 15px; border-radius: 8px; font-weight: bold; text-align: center; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 15px; text-align: right; border-bottom: 1px solid #eee; }
-        th { background-color: #f8f9fa; color: #2c3e50; font-size: 15px; }
-        tr:hover { background-color: #fcfcfc; }
-        
-        /* تنسيق أزرار الحضور */
-        .status-options { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center; }
-        .status-options label { cursor: pointer; padding: 6px 12px; border-radius: 6px; border: 1px solid #ddd; transition: 0.3s; font-weight: bold; font-size: 14px; color: #555; background: #fff;}
-        .status-options input[type="radio"] { display: none; }
-        
-        /* ألوان الحالات عند التحديد */
-        .status-options input[value="حاضر"]:checked + label { background-color: #2ecc71; color: white; border-color: #2ecc71; }
-        .status-options input[value="غائب"]:checked + label { background-color: #e74c3c; color: white; border-color: #e74c3c; }
-        .status-options input[value="مستأذن"]:checked + label { background-color: #f1c40f; color: white; border-color: #f1c40f; }
-        .status-options input[value="مأجز"]:checked + label { background-color: #9b59b6; color: white; border-color: #9b59b6; }
-        
-        .submit-btn { display: block; width: 100%; padding: 15px; background-color: #34495e; color: white; border: none; border-radius: 8px; font-size: 18px; font-family: inherit; font-weight: bold; margin-top: 30px; cursor: pointer; transition: 0.3s; }
-        .submit-btn:hover { background-color: #2c3e50; }
-        
-        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; }
-        .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        
-        .done-message { text-align: center; padding: 40px 20px; background-color: #f8f9fa; border-radius: 12px; margin-top: 20px; }
-        .done-message i { font-size: 50px; color: #2ecc71; margin-bottom: 15px; }
-        .edit-btn { display: inline-block; margin-top: 20px; padding: 12px 25px; background-color: #2980b9; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; font-family: inherit; }
-        .edit-btn:hover { background-color: #3498db; }
-        
-        .date-input-container { background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 20px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; }
-        .date-input-container input { padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-family: inherit; font-weight: bold; }
-
-        /* تنسيقات حقل الملاحظة الجديد */
-        .note-btn { background: none; border: none; color: #3498db; cursor: pointer; font-size: 20px; transition: 0.2s; margin-right: 5px; }
-        .note-btn:hover { color: #2980b9; transform: scale(1.1); }
-        .note-input { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: inherit; margin-top: 10px; background: #fdfdfd; box-sizing: border-box; }
-        .note-input:focus { border-color: #3498db; outline: none; }
-        .note-display { font-size: 12px; color: #3498db; margin-top: 5px; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; }
+        /* إخفاء شريط التمرير للحفاظ على نظافة التصميم */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+        /* أنيميشن ناعم للظهور */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="text-slate-800 pb-20">
 
-<div class="container">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
+        <div class="mb-6 space-y-3 fade-in">
         {% for category, message in messages %}
-          <div class="alert {% if category == 'success' %}alert-success{% else %}alert-error{% endif %}">
-              {{ message }}
-          </div>
+            <div class="flex items-center gap-3 p-4 rounded-xl font-bold shadow-sm border {% if category == 'success' %}bg-emerald-50 text-emerald-700 border-emerald-200{% else %}bg-rose-50 text-rose-700 border-rose-200{% endif %}">
+                <i class="fa-solid {% if category == 'success' %}fa-circle-check text-xl{% else %}fa-circle-exclamation text-xl{% endif %}"></i>
+                <span>{{ message }}</span>
+            </div>
         {% endfor %}
+        </div>
       {% endif %}
     {% endwith %}
 
-    <div class="header">
-        <div class="welcome-text">
-            <h1>مرحباً، {{ current_user.name }} 👋</h1>
-            <p>مندوب شقة ({{ apt_num }})</p>
-            <a href="{{ url_for('logout') }}" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> تسجيل الخروج</a>
+    <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 fade-in relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        
+        <div class="flex items-center gap-4 relative z-10 w-full md:w-auto justify-between md:justify-start">
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-800 mb-1">مرحباً، {{ current_user.name }} 👋</h1>
+                <p class="text-slate-500 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-building text-cyan-600"></i> مندوب شقة ({{ apt_num }})
+                </p>
+            </div>
         </div>
-        <div class="time-badge">
-            <div id="current-date">{{ today.strftime('%Y-%m-%d') }}</div>
-            <div id="clock">00:00:00</div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto justify-between">
+            <div class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl font-bold text-sm flex flex-col items-center shadow-inner border border-slate-200">
+                <span id="current-date">{{ today.strftime('%Y-%m-%d') }}</span>
+                <span id="clock" class="text-cyan-600 font-extrabold">00:00:00</span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-4 py-3 rounded-xl transition-colors duration-200 text-sm font-bold flex items-center gap-2 border border-rose-100">
+                <i class="fa-solid fa-power-off"></i> خروج
+            </a>
         </div>
     </div>
 
     {% if already_recorded %}
-        <div id="doneSection" class="done-message">
-            <i class="fa-solid fa-clipboard-check"></i>
-            <h2>تم إرسال التحضير!</h2>
-            <p>شكراً لك، لقد تم حفظ كشف التحضير بنجاح.</p>
-            <button type="button" onclick="showEditForm()" class="edit-btn"><i class="fa-solid fa-pen"></i> تعديل التحضير</button>
+        <div id="doneSection" class="bg-white rounded-3xl p-10 shadow-sm border border-slate-200 text-center fade-in mb-8">
+            <div class="w-24 h-24 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-800 mb-2">تم إرسال التحضير بنجاح!</h2>
+            <p class="text-slate-500 mb-6 font-bold">شكراً لجهودك، تم حفظ كشف تحضير شقتك لهذا اليوم.</p>
+            <button type="button" onclick="showEditForm()" class="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-slate-800/30 flex items-center justify-center gap-2 mx-auto">
+                <i class="fa-solid fa-pen"></i> تعديل التحضير
+            </button>
         </div>
     {% endif %}
-
-    <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %}>
+        {% if not is_allowed_time and not allow_date_change %}
+        
+        <div class="bg-rose-50 rounded-3xl p-10 shadow-sm border border-rose-200 text-center fade-in mb-8">
+            <div class="w-24 h-24 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-slate-800 mb-2">النظام مغلق حالياً</h2>
+            <p class="text-slate-600 mb-2 font-bold">عذراً، يفتح نظام التحضير أبوابه يومياً في الأوقات التالية فقط:</p>
+            <div class="inline-block bg-white border border-rose-100 px-6 py-3 rounded-xl shadow-sm mt-2">
+                <span class="text-rose-600 font-extrabold text-lg">6:00 مساءً</span>
+                <span class="text-slate-400 font-bold mx-2">إلى</span>
+                <span class="text-rose-600 font-extrabold text-lg">3:00 فجراً</span>
+            </div>
+            <p class="text-sm text-slate-500 mt-6"><i class="fa-solid fa-circle-info"></i> إذا واجهتك مشكلة، يرجى مراجعة إدارة السكن.</p>
+        </div>
+        
+    {% else %}
+        
+        <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in space-y-4">
+            
+            </form>
+        {% endif %}
+    <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in space-y-4">
         
         {% if allow_date_change %}
-            <div class="date-input-container">
-                <span><i class="fa-solid fa-triangle-exclamation"></i> تم تفعيل وضع تعديل التاريخ</span>
-                <input type="date" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}">
+            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-2 text-amber-700 font-bold">
+                    <i class="fa-solid fa-calendar-day text-xl"></i>
+                    <span>وضع تعديل التاريخ مفعل:</span>
+                </div>
+                <input type="date" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}" class="bg-white border border-amber-300 text-amber-800 font-bold rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-amber-500 w-full md:w-auto">
             </div>
         {% else %}
             <input type="hidden" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}">
         {% endif %}
 
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 5%;">م</th>
-                    <th style="width: 35%;">اسم الطالب</th>
-                    <th style="text-align: center; width: 10%;">الغرفة</th>
-                    <th style="text-align: center; width: 50%;">حالة الحضور</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- بداية حلقة التكرار للطلاب -->
-                {% for student in students %}
-                
+        <div class="grid grid-cols-1 gap-4">
+            {% for student in students %}
+            
                 {% set db_status = att_dict.get(student.id) %}
                 {% if db_status %}
                     {% set current_status = db_status %}
@@ -122,62 +126,85 @@
                     {% set current_status = 'حاضر' %}
                 {% endif %}
 
-                <tr>
-                    <td style="font-weight: bold; color: #7f8c8d;">{{ loop.index }}</td>
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-cyan-300 transition-colors duration-300">
                     
-                    <td>
-                        <strong style="font-size: 15px; color: #2c3e50;">{{ student.full_name }}</strong>
-                        <!-- عرض الملاحظة القديمة إن وجدت أسفل اسم الطالب -->
-                        {% if att_dict_notes and att_dict_notes.get(student.id) %}
-                        <div id="note_display_{{ student.id }}" class="note-display">
-                            <i class="fa-solid fa-comment-dots"></i> {{ att_dict_notes.get(student.id) }}
-                        </div>
-                        {% endif %}
-                    </td>
-                    
-                    <td style="text-align: center; font-weight: bold; color: #7f8c8d; font-size: 16px;">
-                        {{ student.room_number }}
-                    </td>
-                    
-                    <td>
-                        <div class="status-options">
-                            <input type="radio" id="present_{{ student.id }}" name="student_{{ student.id }}" value="حاضر" required {% if current_status == 'حاضر' %}checked{% endif %}>
-                            <label for="present_{{ student.id }}">حاضر</label>
-                            
-                            <input type="radio" id="absent_{{ student.id }}" name="student_{{ student.id }}" value="غائب" required {% if current_status == 'غائب' %}checked{% endif %}>
-                            <label for="absent_{{ student.id }}">غائب</label>
-                            
-                            <input type="radio" id="excused_{{ student.id }}" name="student_{{ student.id }}" value="مستأذن" required {% if current_status == 'مستأذن' %}checked{% endif %}>
-                            <label for="excused_{{ student.id }}">مستأذن</label>
-                            
-                            <input type="radio" id="leave_{{ student.id }}" name="student_{{ student.id }}" value="مأجز" required {% if current_status == 'مأجز' %}checked{% endif %}>
-                            <label for="leave_{{ student.id }}">مأجز</label>
-
-                            <!-- زر أيقونة إضافة الملاحظة -->
-                            <button type="button" onclick="toggleNote('{{ student.id }}')" class="note-btn" title="إضافة/تعديل ملاحظة">
-                                <i class="fa-regular fa-comment-dots"></i>
-                            </button>
+                    <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-extrabold shadow-inner">
+                                {{ loop.index }}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800 leading-none mb-1">{{ student.full_name }}</h3>
+                                <p class="text-sm text-slate-500 font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-door-open text-slate-400"></i> غرفة: <span class="text-slate-700">{{ student.room_number }}</span>
+                                </p>
+                            </div>
                         </div>
 
-                        <!-- حقل الملاحظة المخفي (يظهر عند الضغط على الأيقونة) -->
-                        <div id="note_container_{{ student.id }}" style="display: none;">
+                        <button type="button" onclick="toggleNote('{{ student.id }}')" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors">
+                            <i class="fa-regular fa-comment-dots text-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                        
+                        <div class="relative">
+                            <input type="radio" id="present_{{ student.id }}" name="student_{{ student.id }}" value="حاضر" required {% if current_status == 'حاضر' %}checked{% endif %} class="peer hidden">
+                            <label for="present_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                حاضر
+                            </label>
+                        </div>
+
+                        <div class="relative">
+                            <input type="radio" id="absent_{{ student.id }}" name="student_{{ student.id }}" value="غائب" required {% if current_status == 'غائب' %}checked{% endif %} class="peer hidden">
+                            <label for="absent_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                غائب
+                            </label>
+                        </div>
+
+                        <div class="relative">
+                            <input type="radio" id="excused_{{ student.id }}" name="student_{{ student.id }}" value="مستأذن" required {% if current_status == 'مستأذن' %}checked{% endif %} class="peer hidden">
+                            <label for="excused_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                مستأذن
+                            </label>
+                        </div>
+
+                        <div class="relative">
+                            <input type="radio" id="leave_{{ student.id }}" name="student_{{ student.id }}" value="مأجز" required {% if current_status == 'مأجز' %}checked{% endif %} class="peer hidden">
+                            <label for="leave_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-purple-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                مأجز
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <div id="note_container_{{ student.id }}" class="mt-4" {% if not att_dict_notes or not att_dict_notes.get(student.id) %}style="display: none;"{% endif %}>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                <i class="fa-solid fa-pen-clip text-slate-400"></i>
+                            </div>
                             <input type="text" name="note_{{ student.id }}" 
                                 value="{{ att_dict_notes.get(student.id, '') if att_dict_notes else '' }}"
-                                placeholder="اكتب ملاحظة قصيرة (اختياري)..." 
-                                class="note-input">
+                                placeholder="اكتب ملاحظة (مثال: لديه عذر طبي، مسافر...)" 
+                                class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pr-10 p-2.5 font-bold outline-none transition-all">
                         </div>
-                    </td>
-                </tr>
-                {% endfor %}
-                <!-- نهاية حلقة التكرار -->
-            </tbody>
-        </table>
+                    </div>
 
-        <button type="submit" class="submit-btn"><i class="fa-solid fa-paper-plane"></i> إرسال واعتماد التحضير</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="sticky bottom-4 mt-8">
+            <button type="submit" class="w-full bg-gradient-to-l from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-lg py-4 rounded-2xl shadow-xl shadow-cyan-600/30 flex justify-center items-center gap-3 transition-transform active:scale-[0.98]">
+                <i class="fa-solid fa-paper-plane text-xl"></i> اعتماد كشف التحضير
+            </button>
+        </div>
+
     </form>
 </div>
 
 <script>
+    // ساعة حية
     function updateClock() {
         const now = new Date();
         document.getElementById('clock').textContent = now.toLocaleTimeString('ar-SA');
@@ -185,17 +212,21 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+    // إظهار نموذج التعديل
     function showEditForm() {
         document.getElementById('doneSection').style.display = 'none';
-        document.getElementById('attendanceForm').style.display = 'block';
+        const form = document.getElementById('attendanceForm');
+        form.style.display = 'block';
+        form.classList.add('fade-in');
     }
 
-    // دالة إظهار وإخفاء حقل الملاحظة
+    // إظهار/إخفاء حقل الملاحظة بشكل ناعم
     function toggleNote(studentId) {
         const container = document.getElementById('note_container_' + studentId);
         if (container.style.display === 'none' || container.style.display === '') {
             container.style.display = 'block';
-            container.querySelector('input').focus(); // التركيز على الحقل مباشرة للكتابة
+            container.classList.add('fade-in');
+            setTimeout(() => { container.querySelector('input').focus(); }, 50);
         } else {
             container.style.display = 'none';
         }
