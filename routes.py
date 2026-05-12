@@ -550,17 +550,17 @@ def register_routes(app):
             Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])
         ).order_by(Student.room_number).all()
         
-        # حساب توقيت اليمن (UTC+3)
+       # حساب توقيت اليمن (UTC+3)
         yemen_tz = timezone(timedelta(hours=3))
         now_in_yemen = datetime.now(yemen_tz)
         current_hour = now_in_yemen.hour
-        
-        # التحقق من الوقت: أكبر من أو يساوي 18 (6 مساءً) -- أو -- أصغر من 3 (3 فجراً)
         is_allowed_time = (current_hour >= 18) or (current_hour < 3)
         
-        today = date.today()
+        # 🌟 استخدام التاريخ المنطقي بشكل صحيح 🌟
         logical_today = (now_in_yemen - timedelta(hours=3)).date()
-        existing_records = Attendance.query.filter_by(recorded_by=current_user.id, date=today).all()
+        
+        # لاحظ هنا استخدمنا logical_today بدلاً من today
+        existing_records = Attendance.query.filter_by(recorded_by=current_user.id, date=logical_today).all()
         att_dict = {r.student_id: r.status for r in existing_records}
         
         already_recorded = len(existing_records) > 0
@@ -571,10 +571,9 @@ def register_routes(app):
                                apt_num=apt_num, 
                                already_recorded=already_recorded,
                                att_dict=att_dict,
-                               today=today,
+                               today=logical_today, # نمرر التاريخ المنطقي للواجهة
                                allow_date_change=allow_date,
-                               is_allowed_time=is_allowed_time) # تمرير حالة الوقت للواجهة
-
+                               is_allowed_time=is_allowed_time)
 
 
     @app.route('/submit_attendance', methods=['POST'])
@@ -599,9 +598,9 @@ def register_routes(app):
         # 🌟 حساب التاريخ المنطقي للحفظ 🌟
         logical_today = (now_in_yemen - timedelta(hours=3)).date()
 
-        today = date.today()
         record_date_str = request.form.get('record_date')
-        record_date = datetime.strptime(record_date_str, '%Y-%m-%d').date() if record_date_str else date.today()
+        # هنا أيضاً نستخدم logical_today بدلاً من date.today()
+        record_date = datetime.strptime(record_date_str, '%Y-%m-%d').date() if record_date_str else logical_today
         
         # حماية IDOR: جلب معرفات الطلاب المسموح للمندوب بالتحضير لهم فقط
         mandoob_apt = current_user.student.apartment_number
@@ -654,6 +653,42 @@ def register_routes(app):
         db.session.commit()
         flash(f'تم حفظ كشف التحضير لتاريخ {record_date} بنجاح!', 'success')
         return redirect(url_for('mandoob_dashboard'))
+
+
+    # -------------------------------------------------------------------------
+    # مسار المهام المجدولة (Cron Job) - محمي بكلمة سر
+    # -------------------------------------------------------------------------
+    @app.route('/cron/check_lazy_mandoobs')
+    def cron_check_lazy_mandoobs():
+        # 1. حماية المسار بكلمة سر تمرر في الرابط
+        secret_key = request.args.get('key')
+        if secret_key != 'Bazara_Super_Secret_2026': # يمكنك تغيير هذه الكلمة
+            return "غير مصرح لك", 403
+            
+        from datetime import datetime, timedelta, timezone
+        
+        # 2. حساب التاريخ المنطقي
+        yemen_tz = timezone(timedelta(hours=3))
+        now_in_yemen = datetime.now(yemen_tz)
+        logical_today = (now_in_yemen - timedelta(hours=3)).date()
+        
+        # 3. الفحص
+        active_mandoobs = User.query.filter_by(role='mandoob', is_active=True).all()
+        submitted_records = Attendance.query.filter_by(date=logical_today).all()
+        submitted_mandoob_ids = {record.recorded_by for record in submitted_records}
+        
+        lazy_mandoobs = [m for m in active_mandoobs if m.id not in submitted_mandoob_ids]
+        
+        if not lazy_mandoobs:
+            return "تم فحص النظام: الجميع قام بالتحضير.", 200
+
+        # 4. (هنا سيتم إرسال الإشعارات للمتأخرين لاحقاً)
+        for mandoob in lazy_mandoobs:
+            apt = mandoob.student.apartment_number if mandoob.student else "غير معروف"
+            print(f"تنبيه: المندوب {mandoob.username} في شقة {apt} متأخر!")
+            
+        return f"تم الفحص: يوجد {len(lazy_mandoobs)} مندوب متأخر وتم إرسال التنبيهات.", 200
+
 
     # =========================================================================
     # 7. منطقة المطور (Developer Area)

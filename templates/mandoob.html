@@ -79,7 +79,6 @@
         </div>
     {% endif %}
         {% if not is_allowed_time and not allow_date_change %}
-        
         <div class="bg-rose-50 rounded-3xl p-10 shadow-sm border border-rose-200 text-center fade-in mb-8">
             <div class="w-24 h-24 bg-rose-100 text-rose-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-4 shadow-inner">
                 <i class="fa-solid fa-clock"></i>
@@ -95,112 +94,102 @@
         </div>
         
     {% else %}
-        
         <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in space-y-4">
             
-            </form>
-        {% endif %}
-    <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in space-y-4">
-        
-        {% if allow_date_change %}
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-                <div class="flex items-center gap-2 text-amber-700 font-bold">
-                    <i class="fa-solid fa-calendar-day text-xl"></i>
-                    <span>وضع تعديل التاريخ مفعل:</span>
-                </div>
-                <input type="date" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}" class="bg-white border border-amber-300 text-amber-800 font-bold rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-amber-500 w-full md:w-auto">
-            </div>
-        {% else %}
-            <input type="hidden" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}">
-        {% endif %}
-
-        <div class="grid grid-cols-1 gap-4">
-            {% for student in students %}
-            
-                {% set db_status = att_dict.get(student.id) %}
-                {% if db_status %}
-                    {% set current_status = db_status %}
-                {% elif student.status == 'في إجازة' %}
-                    {% set current_status = 'مأجز' %}
-                {% else %}
-                    {% set current_status = 'حاضر' %}
-                {% endif %}
-
-                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-cyan-300 transition-colors duration-300">
-                    
-                    <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-extrabold shadow-inner">
-                                {{ loop.index }}
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-slate-800 leading-none mb-1">{{ student.full_name }}</h3>
-                                <p class="text-sm text-slate-500 font-bold flex items-center gap-1">
-                                    <i class="fa-solid fa-door-open text-slate-400"></i> غرفة: <span class="text-slate-700">{{ student.room_number }}</span>
-                                </p>
-                            </div>
-                        </div>
-
-                        <button type="button" onclick="toggleNote('{{ student.id }}')" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors">
-                            <i class="fa-regular fa-comment-dots text-lg"></i>
-                        </button>
+            {% if allow_date_change %}
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-2 text-amber-700 font-bold">
+                        <i class="fa-solid fa-calendar-day text-xl"></i>
+                        <span>وضع تعديل التاريخ مفعل:</span>
                     </div>
+                    <input type="date" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}" max="{{ today.strftime('%Y-%m-%d') }}" class="bg-white border border-amber-300 text-amber-800 font-bold rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-amber-500 w-full md:w-auto">
+                </div>
+            {% else %}
+                <input type="hidden" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}">
+            {% endif %}
 
-                    <div class="grid grid-cols-4 gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+            <div class="grid grid-cols-1 gap-4">
+                {% for student in students %}
+                
+                    {% set db_status = att_dict.get(student.id) %}
+                    {% if db_status %}
+                        {% set current_status = db_status %}
+                    {% elif student.status == 'في إجازة' %}
+                        {% set current_status = 'مأجز' %}
+                    {% else %}
+                        {% set current_status = 'حاضر' %}
+                    {% endif %}
+
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-cyan-300 transition-colors duration-300">
                         
-                        <div class="relative">
-                            <input type="radio" id="present_{{ student.id }}" name="student_{{ student.id }}" value="حاضر" required {% if current_status == 'حاضر' %}checked{% endif %} class="peer hidden">
-                            <label for="present_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
-                                حاضر
-                            </label>
-                        </div>
-
-                        <div class="relative">
-                            <input type="radio" id="absent_{{ student.id }}" name="student_{{ student.id }}" value="غائب" required {% if current_status == 'غائب' %}checked{% endif %} class="peer hidden">
-                            <label for="absent_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
-                                غائب
-                            </label>
-                        </div>
-
-                        <div class="relative">
-                            <input type="radio" id="excused_{{ student.id }}" name="student_{{ student.id }}" value="مستأذن" required {% if current_status == 'مستأذن' %}checked{% endif %} class="peer hidden">
-                            <label for="excused_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
-                                مستأذن
-                            </label>
-                        </div>
-
-                        <div class="relative">
-                            <input type="radio" id="leave_{{ student.id }}" name="student_{{ student.id }}" value="مأجز" required {% if current_status == 'مأجز' %}checked{% endif %} class="peer hidden">
-                            <label for="leave_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-purple-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
-                                مأجز
-                            </label>
-                        </div>
-
-                    </div>
-
-                    <div id="note_container_{{ student.id }}" class="mt-4" {% if not att_dict_notes or not att_dict_notes.get(student.id) %}style="display: none;"{% endif %}>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                <i class="fa-solid fa-pen-clip text-slate-400"></i>
+                        <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-extrabold shadow-inner">
+                                    {{ loop.index }}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-slate-800 leading-none mb-1">{{ student.full_name }}</h3>
+                                    <p class="text-sm text-slate-500 font-bold flex items-center gap-1">
+                                        <i class="fa-solid fa-door-open text-slate-400"></i> غرفة: <span class="text-slate-700">{{ student.room_number }}</span>
+                                    </p>
+                                </div>
                             </div>
-                            <input type="text" name="note_{{ student.id }}" 
-                                value="{{ att_dict_notes.get(student.id, '') if att_dict_notes else '' }}"
-                                placeholder="اكتب ملاحظة (مثال: لديه عذر طبي، مسافر...)" 
-                                class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pr-10 p-2.5 font-bold outline-none transition-all">
+
+                            <button type="button" onclick="toggleNote('{{ student.id }}')" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors">
+                                <i class="fa-regular fa-comment-dots text-lg"></i>
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                            <div class="relative">
+                                <input type="radio" id="present_{{ student.id }}" name="student_{{ student.id }}" value="حاضر" required {% if current_status == 'حاضر' %}checked{% endif %} class="peer hidden">
+                                <label for="present_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                    حاضر
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="radio" id="absent_{{ student.id }}" name="student_{{ student.id }}" value="غائب" required {% if current_status == 'غائب' %}checked{% endif %} class="peer hidden">
+                                <label for="absent_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                    غائب
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="radio" id="excused_{{ student.id }}" name="student_{{ student.id }}" value="مستأذن" required {% if current_status == 'مستأذن' %}checked{% endif %} class="peer hidden">
+                                <label for="excused_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                    مستأذن
+                                </label>
+                            </div>
+                            <div class="relative">
+                                <input type="radio" id="leave_{{ student.id }}" name="student_{{ student.id }}" value="مأجز" required {% if current_status == 'مأجز' %}checked{% endif %} class="peer hidden">
+                                <label for="leave_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-purple-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                    مأجز
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="note_container_{{ student.id }}" class="mt-4" {% if not att_dict_notes or not att_dict_notes.get(student.id) %}style="display: none;"{% endif %}>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fa-solid fa-pen-clip text-slate-400"></i>
+                                </div>
+                                <input type="text" name="note_{{ student.id }}" 
+                                    value="{{ att_dict_notes.get(student.id, '') if att_dict_notes else '' }}"
+                                    placeholder="اكتب ملاحظة (مثال: لديه عذر طبي، مسافر...)" 
+                                    class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pr-10 p-2.5 font-bold outline-none transition-all">
+                            </div>
                         </div>
                     </div>
+                {% endfor %}
+            </div>
 
-                </div>
-            {% endfor %}
-        </div>
+            <div class="sticky bottom-4 mt-8">
+                <button type="submit" class="w-full bg-gradient-to-l from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-lg py-4 rounded-2xl shadow-xl shadow-cyan-600/30 flex justify-center items-center gap-3 transition-transform active:scale-[0.98]">
+                    <i class="fa-solid fa-paper-plane text-xl"></i> اعتماد كشف التحضير
+                </button>
+            </div>
+        </form>
+        {% endif %} 
 
-        <div class="sticky bottom-4 mt-8">
-            <button type="submit" class="w-full bg-gradient-to-l from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-lg py-4 rounded-2xl shadow-xl shadow-cyan-600/30 flex justify-center items-center gap-3 transition-transform active:scale-[0.98]">
-                <i class="fa-solid fa-paper-plane text-xl"></i> اعتماد كشف التحضير
-            </button>
-        </div>
-
-    </form>
 </div>
 
 <script>
