@@ -9,7 +9,8 @@ from sqlalchemy.exc import IntegrityError
 import pandas as pd
 import json
 import os
-
+from flask import jsonify
+from pywebpush import webpush, WebPushException
 # =========================================================================
 # دوال مساعدة للأمان والتكوين
 # =========================================================================
@@ -655,24 +656,53 @@ def register_routes(app):
         return redirect(url_for('mandoob_dashboard'))
 
 
+
+    # ---------------------------------------------------------
+    # مسار عامل الخدمة (يجب أن يكون في الجذر Root)
+    # ---------------------------------------------------------
+    @app.route('/sw.js')
+    def sw():
+        return app.send_static_file('sw.js')
+
+    # ---------------------------------------------------------
+    # مسار حفظ اشتراك الإشعارات في قاعدة البيانات
+    # ---------------------------------------------------------
+    @app.route('/subscribe', methods=['POST'])
+    @login_required
+    def subscribe():
+        if current_user.role != 'mandoob':
+            return jsonify({'error': 'غير مصرح'}), 403
+            
+        sub_info = request.get_json()
+        sub_str = json.dumps(sub_info)
+        
+        # التحقق مما إذا كان المندوب قد اشترك مسبقاً بنفس المتصفح
+        existing_sub = PushSubscription.query.filter_by(user_id=current_user.id, subscription_json=sub_str).first()
+        
+        if not existing_sub:
+            new_sub = PushSubscription(user_id=current_user.id, subscription_json=sub_str)
+            db.session.add(new_sub)
+            db.session.commit()
+            
+        return jsonify({'status': 'تم تفعيل الإشعارات بنجاح!'})
+
+
     # -------------------------------------------------------------------------
-    # مسار المهام المجدولة (Cron Job) - محمي بكلمة سر
+    # مسار المهام المجدولة (يُستدعى يومياً عبر cron-job.org)
     # -------------------------------------------------------------------------
     @app.route('/cron/check_lazy_mandoobs')
     def cron_check_lazy_mandoobs():
-        # 1. حماية المسار بكلمة سر تمرر في الرابط
+        # 1. التحقق من مفتاح الأمان
         secret_key = request.args.get('key')
-        if secret_key != 'Bazara_Super_Secret_2026': # يمكنك تغيير هذه الكلمة
+        if secret_key != 'Bazara_Super_Secret_2026':
             return "غير مصرح لك", 403
             
-        from datetime import datetime, timedelta, timezone
-        
         # 2. حساب التاريخ المنطقي
         yemen_tz = timezone(timedelta(hours=3))
         now_in_yemen = datetime.now(yemen_tz)
         logical_today = (now_in_yemen - timedelta(hours=3)).date()
         
-        # 3. الفحص
+        # 3. جلب المناديب المتأخرين
         active_mandoobs = User.query.filter_by(role='mandoob', is_active=True).all()
         submitted_records = Attendance.query.filter_by(date=logical_today).all()
         submitted_mandoob_ids = {record.recorded_by for record in submitted_records}
@@ -682,12 +712,36 @@ def register_routes(app):
         if not lazy_mandoobs:
             return "تم فحص النظام: الجميع قام بالتحضير.", 200
 
-        # 4. (هنا سيتم إرسال الإشعارات للمتأخرين لاحقاً)
+        # 4. إطلاق الإشعارات (Web Push) للمتأخرين
+        notifications_sent = 0
         for mandoob in lazy_mandoobs:
-            apt = mandoob.student.apartment_number if mandoob.student else "غير معروف"
-            print(f"تنبيه: المندوب {mandoob.username} في شقة {apt} متأخر!")
+            # جلب جميع اشتراكات هذا المندوب (قد يكون مسجلاً من جواله ولابتوبه)
+            subscriptions = PushSubscription.query.filter_by(user_id=mandoob.id).all()
             
-        return f"تم الفحص: يوجد {len(lazy_mandoobs)} مندوب متأخر وتم إرسال التنبيهات.", 200
+            for sub in subscriptions:
+                try:
+                    # تحويل النص المحفوظ في قاعدة البيانات إلى قاموس بايثون
+                    sub_info = json.loads(sub.subscription_json)
+                    
+                    # إرسال الإشعار
+                    webpush(
+                        subscription_info=sub_info,
+                        data=json.dumps({
+                            "title": "🚨 تذكير هام من الإدارة!",
+                            "body": f"يا {mandoob.name}، لم تقم برفع تحضير شقتك حتى الآن. يرجى الدخول للنظام فوراً."
+                        }),
+                        vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
+                        vapid_claims={"sub": app.config['VAPID_CLAIM_EMAIL']}
+                    )
+                    notifications_sent += 1
+                    
+                except WebPushException as ex:
+                    print(f"فشل إرسال الإشعار للمندوب {mandoob.name}: {repr(ex)}")
+                    # (اختياري) يمكنك حذف الاشتراك من قاعدة البيانات إذا انتهت صلاحيته
+                    # db.session.delete(sub)
+                    # db.session.commit()
+                    
+        return f"تم الفحص: يوجد {len(lazy_mandoobs)} مندوب متأخر، وتم إرسال {notifications_sent} إشعار بنجاح.", 200
 
 
     # =========================================================================

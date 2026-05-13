@@ -52,6 +52,9 @@
                 <p class="text-slate-500 font-bold flex items-center gap-2">
                     <i class="fa-solid fa-building text-cyan-600"></i> مندوب شقة ({{ apt_num }})
                 </p>
+                <button id="enable-push-btn" onclick="subscribeToPush()" class="mb-4 bg-cyan-100 text-cyan-700 border border-cyan-300 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-cyan-200 transition">
+                    <i class="fa-solid fa-bell"></i> تفعيل إشعارات التذكير بالتحضير
+                </button>
             </div>
         </div>
 
@@ -218,6 +221,52 @@
             setTimeout(() => { container.querySelector('input').focus(); }, 50);
         } else {
             container.style.display = 'none';
+        }
+    }
+
+    // المفتاح العام الذي حصلت عليه من موقع vapidkeys (ضعه هنا)
+    const publicVapidKey = 'BGKcO7m8HS9JfRP7S6I3aKEm-Zzu8optzsN_C8IzXv2e35OxzsvlL46Ya2oZGDVx1YSQgjS51QOSyH6Vlmo9Vrs';
+
+    // دالة مساعدة لتحويل المفتاح لتنسيق يقبله المتصفح
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    }
+
+    async function subscribeToPush() {
+        if ('serviceWorker' in navigator && 'PushManager' in window) {
+            try {
+                // 1. تسجيل الموظف الخفي
+                const register = await navigator.serviceWorker.register('/sw.js');
+                
+                // 2. طلب الاشتراك من المتصفح
+                const subscription = await register.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+                });
+
+                // 3. إرسال بيانات الاشتراك للسيرفر الخاص بنا
+                await fetch('/subscribe_push', {
+                    method: 'POST',
+                    body: JSON.stringify(subscription),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                alert('تم تفعيل الإشعارات بنجاح! سيتم تذكيرك يومياً إذا نسيت التحضير.');
+                document.getElementById('enable-push-btn').style.display = 'none'; // إخفاء الزر بعد التفعيل
+                
+            } catch (error) {
+                console.error('خطأ في تفعيل الإشعارات:', error);
+                alert('حدث خطأ. تأكد من إعطاء المتصفح صلاحية إرسال الإشعارات.');
+            }
+        } else {
+            alert('متصفحك لا يدعم هذه الميزة، يرجى تحديث المتصفح أو استخدام Google Chrome.');
         }
     }
 </script>

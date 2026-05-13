@@ -43,3 +43,11 @@ class Attendance(db.Model):
     status = db.Column(db.String(20), nullable=False)
     recorded_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     note = db.Column(db.String(255), nullable=True) # إضافة هذا السطر
+
+
+class PushSubscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    subscription_json = db.Column(db.Text, nullable=False) # هنا سنحفظ كود المتصفح المعقد
+    
+    user = db.relationship('User', backref=db.backref('push_subscriptions', lazy=True))
