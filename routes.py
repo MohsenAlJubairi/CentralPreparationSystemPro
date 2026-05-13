@@ -6,7 +6,7 @@ from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from urllib.parse import urlparse, urljoin
 from sqlalchemy.exc import IntegrityError
-import pandas as pd
+#import pandas as pd
 import json
 import os
 from flask import jsonify
