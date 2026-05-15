@@ -560,6 +560,34 @@ def register_routes(app):
         # 🌟 استخدام التاريخ المنطقي بشكل صحيح 🌟
         logical_today = (now_in_yemen - timedelta(hours=3)).date()
         
+
+        # 2. بناء بيانات "تقويم الحماسة" (آخر 7 أيام)
+        week_stats = []
+        arabic_days = ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد']
+        
+        for i in range(6, -1, -1): # من 6 أيام مضت وصولاً إلى اليوم
+            target_date = logical_today - timedelta(days=i)
+            
+            # البحث عن تحضير في هذا التاريخ لهذا المندوب
+            record = Attendance.query.filter_by(recorded_by=current_user.id, date=target_date).first()
+            
+            day_name = "اليوم" if i == 0 else arabic_days[target_date.weekday()]
+            
+            status = 'future'
+            if record:
+                status = 'attended' # دائرة صفراء
+            elif target_date < logical_today:
+                status = 'missed'   # دائرة حمراء
+            elif i == 0:
+                status = 'pending'  # لم يحضر اليوم بعد
+                
+            week_stats.append({
+                'day': day_name,
+                'status': status,
+                'date': target_date.strftime('%d/%m')
+            })
+
+
         # لاحظ هنا استخدمنا logical_today بدلاً من today
         existing_records = Attendance.query.filter_by(recorded_by=current_user.id, date=logical_today).all()
         att_dict = {r.student_id: r.status for r in existing_records}
@@ -568,6 +596,7 @@ def register_routes(app):
         allow_date = get_setting('ALLOW_DATE_CHANGE', False)
         
         return render_template('mandoob.html', 
+                               week_stats=week_stats, # نرسل بيانات التقويم للواجهة
                                students=students, 
                                apt_num=apt_num, 
                                already_recorded=already_recorded,
