@@ -632,9 +632,12 @@ def register_routes(app):
         # هنا أيضاً نستخدم logical_today بدلاً من date.today()
         record_date = datetime.strptime(record_date_str, '%Y-%m-%d').date() if record_date_str else logical_today
         
-        # حماية IDOR: جلب معرفات الطلاب المسموح للمندوب بالتحضير لهم فقط
+        # 🌟 جلب كائنات الطلاب بدلاً من أرقامهم فقط لتحديث حالتهم 🌟
         mandoob_apt = current_user.student.apartment_number
-        allowed_student_ids = {s.id for s in Student.query.filter_by(apartment_number=mandoob_apt).all()}
+        students_query = Student.query.filter_by(apartment_number=mandoob_apt).all()
+        
+        # تحويلها إلى قاموس لسهولة الوصول السريع
+        allowed_students = {s.id: s for s in students_query}
         VALID_STATUSES = {'حاضر', 'غائب', 'مستأذن', 'مأجز'}
         
         submitted_data = {}
@@ -649,7 +652,7 @@ def register_routes(app):
                 status_value = value.strip()
                 
                 # التحقق الصارم (Mass Assignment و IDOR)
-                if status_value not in VALID_STATUSES or student_id not in allowed_student_ids:
+                if status_value not in VALID_STATUSES or student_id not in allowed_students:
                     continue
                     
                 note_value = request.form.get(f'note_{student_id}', '').strip()[:255]
@@ -668,6 +671,7 @@ def register_routes(app):
         
         # التحديث والإضافة المجمعة
         for s_id, data in submitted_data.items():
+            # 1. حفظ / تحديث سجل التحضير
             if s_id in record_dict:
                 record_dict[s_id].status = data['status']
                 record_dict[s_id].note = data['note']
@@ -679,12 +683,19 @@ def register_routes(app):
                     recorded_by=current_user.id
                 )
                 db.session.add(new_record)
+                
+            # 2. 🌟 تحديث حالة الطالب الأساسية تلقائياً 🌟
+            student = allowed_students[s_id]
+            if data['status'] == 'مأجز':
+                student.status = 'في إجازة'
+            elif data['status'] in ['حاضر', 'غائب', 'مستأذن']:
+                # إذا عاد الطالب من الإجازة وحضّره المندوب، يتم إعادته لحالة "موجود" تلقائياً
+                if student.status == 'في إجازة':
+                    student.status = 'موجود'
 
         db.session.commit()
-        flash(f'تم حفظ كشف التحضير لتاريخ {record_date} بنجاح!', 'success')
+        flash(f'تم حفظ كشف التحضير لتاريخ {record_date} وتحديث حالات الطلاب بنجاح!', 'success')
         return redirect(url_for('mandoob_dashboard'))
-
-
 
     # ---------------------------------------------------------
     # مسار عامل الخدمة (يجب أن يكون في الجذر Root)
