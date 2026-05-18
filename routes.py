@@ -602,7 +602,11 @@ def register_routes(app):
         already_recorded = len(existing_records) > 0
         allow_date = get_setting('ALLOW_DATE_CHANGE', False)
         
+        # فحص هل المندوب الحالي لديه اشتراك مسجل في قاعدة البيانات
+        has_push_sub = PushSubscription.query.filter_by(user_id=current_user.id).first() is not None
+        
         return render_template('mandoob.html', 
+                               has_push_sub=has_push_sub,
                                week_stats=week_stats, # نرسل بيانات التقويم للواجهة
                                students=students, 
                                apt_num=apt_num, 

@@ -52,9 +52,11 @@
                 <p class="text-slate-500 font-bold flex items-center gap-2">
                     <i class="fa-solid fa-building text-cyan-600"></i> مندوب شقة ({{ apt_num }})
                 </p>
+                {% if not has_push_sub %}
                 <button id="enable-notifications-btn" onclick="subscribeToNotifications()" class="mb-4 bg-cyan-100 text-cyan-700 border border-cyan-300 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-cyan-200 transition">
                     <i class="fa-solid fa-bell"></i> تفعيل إشعارات التذكير بالتحضير
                 </button>
+                {% endif %}
             </div>
         </div>       
 
@@ -309,17 +311,10 @@
     async function checkSubscription() {
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             try {
-                const register = await navigator.serviceWorker.register('/sw.js');
-                const subscription = await register.pushManager.getSubscription();
-                
-                const btn = document.getElementById('enable-notifications-btn');
-                // التحقق من وجود الزر قبل محاولة إخفائه
-                if (subscription && btn) {
-                    btn.style.display = 'none';
-                    console.log("المندوب مشترك مسبقاً في الإشعارات.");
-                }
+                await navigator.serviceWorker.register('/sw.js');
+                console.log("تم التحقق من نظام الإشعارات في المتصفح بنجاح.");
             } catch (error) {
-                console.error("خطأ أثناء التحقق من الاشتراك:", error);
+                console.error("خطأ أثناء تسجيل عامل الخدمة:", error);
             }
         }
     }
