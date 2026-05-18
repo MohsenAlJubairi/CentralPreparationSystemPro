@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غير متصل بالإنترنت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-3xl p-10 shadow-sm border border-slate-200 text-center max-w-md w-full">
+        <div class="w-24 h-24 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner relative">
+            <i class="fa-solid fa-wifi"></i>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="w-full h-1 bg-slate-400 transform -rotate-45"></div>
+            </div>
+        </div>
+        
+        <h1 class="text-2xl font-extrabold text-slate-800 mb-2">أنت غير متصل بالإنترنت</h1>
+        <p class="text-slate-500 font-bold mb-8">يبدو أن هناك مشكلة في اتصالك بالشبكة. يرجى التحقق من الواي فاي أو بيانات الهاتف والمحاولة مجدداً.</p>
+        
+        <button onclick="window.location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-right"></i> تحديث الصفحة
+        </button>
+    </div>
+</body>
+</html>

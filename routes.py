@@ -1,12 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from models import db, User, Student, Attendance
+from models import db, User, Student, Attendance, PushSubscription
 from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from urllib.parse import urlparse, urljoin
 from sqlalchemy.exc import IntegrityError
-#import pandas as pd
 import json
 import os
 from flask import jsonify
@@ -169,6 +168,14 @@ def register_routes(app):
             flash('حدث خطأ أثناء قراءة الملف تأكد من التنسيق.', 'error')
 
         return redirect(url_for('manage_students'))
+
+    @app.route('/manifest.json')
+    def manifest():
+        return app.send_static_file('manifest.json')
+
+    @app.route('/offline.html')
+    def offline():
+        return render_template('offline.html')
 
     # =========================================================================
     # 2. لوحة تحكم الإدارة (الرئيسية والإحصائيات)
