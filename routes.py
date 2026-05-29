@@ -316,7 +316,12 @@ def register_routes(app):
         view_filter = request.args.get('view', 'active')
         filtered_students = get_filtered_students(view_filter)
         
+        active_count = Student.query.filter_by( status='فعال').count()
+        vacation_count = Student.query.filter_by(status='في إجازة').count()   
+
         return render_template('students.html', 
+                               active_count=active_count,
+                               vacation_count=vacation_count,
                                current_user=current_user, 
                                students=filtered_students,
                                current_view=view_filter)

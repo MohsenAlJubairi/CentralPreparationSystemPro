@@ -39,7 +39,7 @@ with app.app_context():
         print("✅ تم إنشاء حساب مدير افتراضي بنجاح!")
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
 
 # إعدادات Web Push Notifications
 app.config['VAPID_PUBLIC_KEY'] =  'BGKcO7m8HS9JfRP7S6I3aKEm-Zzu8optzsN_C8IzXv2e35OxzsvlL46Ya2oZGDVx1YSQgjS51QOSyH6Vlmo9Vrs'

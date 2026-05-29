@@ -18,7 +18,8 @@
             <div>
                 <p class="text-slate-500 text-xs font-bold mb-1">الطلاب الموجودين</p>
                 <h3 class="text-2xl font-bold text-emerald-600">
-                    {{ students|selectattr('status', 'equalto', 'فعال')|list|length }}
+                    <!-- استخدام المتغير القادم من الباك إند مباشرة -->
+                    {{ active_count }}
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl"><i class="fa-solid fa-user-check"></i></div>
@@ -28,7 +29,8 @@
             <div>
                 <p class="text-slate-500 text-xs font-bold mb-1">الطلاب في إجازة</p>
                 <h3 class="text-2xl font-bold text-purple-600">
-                    {{ students|selectattr('status', 'equalto', 'في إجازة')|list|length }}
+                    <!-- استخدام المتغير القادم من الباك إند مباشرة -->
+                    {{ vacation_count }}
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl"><i class="fa-solid fa-plane"></i></div>
@@ -56,13 +58,20 @@
                 <option value="تخرج" {% if current_view == 'تخرج' %}selected{% endif %}>تخرج</option>
             </select>
         </div>
-        <button onclick="toggleModal('addStudentModal')" class="bg-primary hover:bg-blue-600 text-white px-5 py-2 rounded-lg font-bold transition shadow-sm flex items-center w-full md:w-auto justify-center">
-            <i class="fa-solid fa-user-plus ml-2"></i> إضافة طالب
-        </button>
+        <div class="flex items-center gap-3 w-full md:w-auto">
+    <h1 style="font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; color: red; font-size: 40px;">
+        &#xf234; تجربة الأيقونة
+    </h1>
+    <button onclick="toggleModal('addStudentModal')" class="flex-1 md:flex-none bg-primary hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
+        <i class="fa-solid fa-user-plus"></i>
+        <span>إضافة طالب</span>
+    </button>
 
-        <button onclick="toggleModal('importStudentsModal')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg font-bold transition shadow-sm flex items-center justify-center">
-            <i class="fa-solid fa-file-import ml-2"></i> استيراد من Excel
-        </button>
+    <button onclick="toggleModal('importStudentsModal')" title="استيراد الطلاب من ملف Excel" class="w-11 h-11 shrink-0 bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 rounded-xl font-bold transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center text-lg outline-none focus:ring-2 focus:ring-emerald-500" aria-label="استيراد من Excel">
+        <i class="fa-solid fa-file-import"></i>
+    </button>
+
+</div>
     </div>
 
     <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
