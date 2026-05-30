@@ -5,6 +5,7 @@
 {% block header_title %}إدارة الطلاب <span class="text-sm font-normal text-slate-500">(الأرشيف والتسجيل)</span>{% endblock %}
 
 {% block content %}
+    {# رسائل النظام التنبيهية #}
     {% with messages = get_flashed_messages(category_filter=["success"]) %}
       {% if messages %}
         <div class="bg-emerald-100 border border-emerald-400 text-emerald-700 px-4 py-3 rounded relative mb-4 shadow-sm">
@@ -13,23 +14,22 @@
       {% endif %}
     {% endwith %}
 
+    {# كروت الإحصائيات #}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between bg-white dark:bg-slate-800">
             <div>
                 <p class="text-slate-500 text-xs font-bold mb-1">الطلاب الموجودين</p>
                 <h3 class="text-2xl font-bold text-emerald-600">
-                    <!-- استخدام المتغير القادم من الباك إند مباشرة -->
                     {{ active_count }}
                 </h3>
             </div>
             <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl"><i class="fa-solid fa-user-check"></i></div>
         </div>
         
-        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between bg-white dark:bg-slate-800">
             <div>
                 <p class="text-slate-500 text-xs font-bold mb-1">الطلاب في إجازة</p>
                 <h3 class="text-2xl font-bold text-purple-600">
-                    <!-- استخدام المتغير القادم من الباك إند مباشرة -->
                     {{ vacation_count }}
                 </h3>
             </div>
@@ -37,7 +37,8 @@
         </div>
     </div>
 
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+    {# شريط التحكم والتصفية والبحث #}
+     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div class="flex gap-3 w-full md:w-3/4">
             <div class="relative flex-1">
                 <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="بحث باسم الطالب..." class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg py-2 pr-10 pl-4 outline-none shadow-sm text-sm">
@@ -58,10 +59,7 @@
                 <option value="تخرج" {% if current_view == 'تخرج' %}selected{% endif %}>تخرج</option>
             </select>
         </div>
-        <div class="flex items-center gap-3 w-full md:w-auto">
-    <h1 style="font-family: 'Font Awesome 6 Free' !important; font-weight: 900 !important; color: red; font-size: 40px;">
-        &#xf234; تجربة الأيقونة
-    </h1>
+        
     <button onclick="toggleModal('addStudentModal')" class="flex-1 md:flex-none bg-primary hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
         <i class="fa-solid fa-user-plus"></i>
         <span>إضافة طالب</span>
@@ -71,10 +69,12 @@
         <i class="fa-solid fa-file-import"></i>
     </button>
 
-</div>
-    </div>
 
-    <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+</div>
+    
+
+    {# جدول عرض الطلاب #}
+    <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden bg-white dark:bg-slate-800">
         <div class="overflow-x-auto">
             <table class="w-full text-right" id="studentsTable">
                 <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 text-sm">
@@ -96,7 +96,7 @@
                         <td class="p-4 text-center"><span class="bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-md text-sm font-bold text-slate-700 dark:text-slate-200">{{ student.apartment_number }}</span></td>
                         <td class="p-4 font-bold text-slate-500 text-center">{{ student.room_number }}</td>
                         <td class="p-4 text-center">
-                            {% if student.status == 'فعال' %}
+                            {% if student.status == 'فعال' or student.status == 'نشط' or student.status == 'موجود' %}
                                 <span class="text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full text-xs font-bold">موجود</span>
                             {% elif student.status == 'في إجازة' %}
                                 <span class="text-purple-700 bg-purple-100 px-3 py-1 rounded-full text-xs font-bold">في إجازة</span>
@@ -130,22 +130,23 @@
         </div>
     </div>
 
-    <div id="addStudentModal" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center px-4">
+    {# 1. نافذة إضافة طالب جديد #}
+    <div id="addStudentModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center px-4">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                 <h3 class="font-bold text-lg text-primary">تسجيل طالب جديد</h3>
-                <button onclick="toggleModal('addStudentModal')" class="text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="toggleModal('addStudentModal')" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 p-2 rounded-lg transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
-          <form action="{{ url_for('manage_students') }}" method="POST" class="p-6 space-y-5">
+            <form action="{{ url_for('manage_students') }}" method="POST" class="p-6 space-y-5">
                 <div>
                     <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">الاسم الرباعي</label>
-                    <input type="text" name="full_name" required placeholder="مثال: أحمد محمد عبدالله" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-primary transition">
+                    <input type="text" name="full_name" required placeholder="مثال: أحمد محمد عبدالله" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-primary transition text-slate-800 dark:text-slate-100">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">الشقة</label>
-                        <select name="apartment_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-primary transition font-bold text-center">
+                        <select name="apartment_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-primary transition font-bold text-center text-slate-800 dark:text-slate-100">
                             {% for i in range(2, 13) %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -153,7 +154,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">الغرفة</label>
-                        <select name="room_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-primary transition font-bold text-center">
+                        <select name="room_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-primary transition font-bold text-center text-slate-800 dark:text-slate-100">
                             {% for i in range(1, 6) %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -162,29 +163,30 @@
                 </div>
                 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-blue-200/50 dark:shadow-none">حفظ</button>
+                    <button type="submit" class="flex-1 bg-primary hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition">حفظ</button>
                     <button type="button" onclick="toggleModal('addStudentModal')" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 py-3 rounded-xl font-bold transition">إلغاء</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="editStudentModal" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center px-4">
+    {# 2. نافذة تعديل بيانات الطالب #}
+    <div id="editStudentModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center px-4">
         <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border-t-4 border-amber-500">
-            <div class="p-5 border-b border-slate-200 flex justify-between items-center">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
                 <h3 class="font-bold text-lg text-amber-600">تعديل بيانات الطالب</h3>
-                <button onclick="toggleModal('editStudentModal')" class="text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition"><i class="fa-solid fa-xmark"></i></button>
+                <button type="button" onclick="toggleModal('editStudentModal')" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 p-2 rounded-lg transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
-          <form id="editForm" method="POST" class="p-6 space-y-5">
+            <form id="editForm" method="POST" class="p-6 space-y-5">
                 <div>
                     <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">الاسم الرباعي</label>
-                    <input type="text" id="edit_name" name="full_name" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition">
+                    <input type="text" id="edit_name" name="full_name" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition text-slate-800 dark:text-slate-100">
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">الشقة</label>
-                        <select id="edit_apt" name="apartment_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition font-bold text-center">
+                        <select id="edit_apt" name="apartment_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition font-bold text-center text-slate-800 dark:text-slate-100">
                             {% for i in range(2, 13) %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -192,7 +194,7 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">الغرفة</label>
-                        <select id="edit_room" name="room_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition font-bold text-center">
+                        <select id="edit_room" name="room_number" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition font-bold text-center text-slate-800 dark:text-slate-100">
                             {% for i in range(1, 6) %}
                                 <option value="{{ i }}">{{ i }}</option>
                             {% endfor %}
@@ -202,7 +204,7 @@
                 
                 <div>
                     <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">حالة الطالب</label>
-                    <select id="edit_status" name="status" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition font-bold">
+                    <select id="edit_status" name="status" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition font-bold text-slate-800 dark:text-slate-100">
                         <option value="فعال" class="text-emerald-600">موجود (نشط)</option>
                         <option value="في إجازة" class="text-purple-600">في إجازة</option>
                         <option value="تخرج" class="text-blue-600">تخرج</option>
@@ -211,61 +213,75 @@
                 </div>
                 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-amber-200/50 dark:shadow-none">تحديث البيانات</button>
+                    <button type="submit" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 rounded-xl font-bold transition">تحديث البيانات</button>
                     <button type="button" onclick="toggleModal('editStudentModal')" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 py-3 rounded-xl font-bold transition">إلغاء</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="importStudentsModal" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center px-4">
-    <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border-t-4 border-emerald-500">
-        <div class="p-5 border-b border-slate-200 flex justify-between items-center">
-            <h3 class="font-bold text-lg text-emerald-600">استيراد جماعي للطلاب</h3>
-            <button onclick="toggleModal('importStudentsModal')" class="text-rose-500"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-        <form action="{{ url_for('import_students') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
-            
-            <div>
-                <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">اختر ملف Excel (.xlsx)</label>
-                <input type="file" name="excel_file" accept=".xlsx, .xls" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+    {# 3. نافذة استيراد جماعي من إكسيل #}
+    <div id="importStudentsModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center px-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border-t-4 border-emerald-500">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="font-bold text-lg text-emerald-600">استيراد جماعي للطلاب</h3>
+                <button type="button" onclick="toggleModal('importStudentsModal')" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 p-2 rounded-lg transition"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <div class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-600">
-                <p class="text-xs font-bold text-slate-500 mb-2">طريقة الاستيراد:</p>
-                <div class="flex gap-4">
-                    <label class="flex items-center text-sm cursor-pointer">
-                        <input type="radio" name="import_mode" value="append" checked class="ml-2 accent-emerald-500"> إضافة للطلاب الحاليين
-                    </label>
-                    <label class="flex items-center text-sm cursor-pointer text-rose-600">
-                        <input type="radio" name="import_mode" value="clear" class="ml-2 accent-rose-500"> مسح الكل واستيراد جديد
-                    </label>
+            <form action="{{ url_for('import_students') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">اختر ملف Excel (.xlsx)</label>
+                    <input type="file" name="excel_file" accept=".xlsx, .xls" required class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
                 </div>
-            </div>
 
-            <div class="space-y-3">
-                <p class="text-xs font-bold text-slate-500">تطابق أسماء الأعمدة في ملفك:</p>
-                <div class="grid grid-cols-1 gap-3">
-                    <input type="text" name="col_name" value="الاسم" placeholder="اسم عمود (الاسم الكامل)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500">
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" name="col_apt" value="رقم الشقة" placeholder="اسم عمود (الشقة)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500 text-center">
-                        <input type="text" name="col_room" value="رقم الغرفة" placeholder="اسم عمود (الغرفة)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500 text-center">
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-600">
+                    <p class="text-xs font-bold text-slate-500 mb-2">طريقة الاستيراد:</p>
+                    <div class="flex gap-4">
+                        <label class="flex items-center text-sm cursor-pointer text-slate-700 dark:text-slate-300">
+                            <input type="radio" name="import_mode" value="append" checked class="ml-2 accent-emerald-500"> إضافة للطلاب الحاليين
+                        </label>
+                        <label class="flex items-center text-sm cursor-pointer text-rose-600">
+                            <input type="radio" name="import_mode" value="clear" class="ml-2 accent-rose-500"> مسح الكل واستيراد جديد
+                        </label>
                     </div>
                 </div>
-            </div>
 
-            <div class="flex gap-3 pt-4">
-                <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition shadow-lg">بدء الاستيراد الآن</button>
-                <button type="button" onclick="toggleModal('importStudentsModal')" class="flex-1 bg-slate-100 text-slate-700 py-3 rounded-xl font-bold transition text-center">إلغاء</button>
-            </div>
-        </form>
+                <div class="space-y-3">
+                    <p class="text-xs font-bold text-slate-500">تطابق أسماء الأعمدة في ملفك:</p>
+                    <div class="grid grid-cols-1 gap-3">
+                        <input type="text" name="col_name" value="الاسم" placeholder="اسم عمود (الاسم الكامل)" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-100">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" name="col_apt" value="رقم الشقة" placeholder="اسم عمود (الشقة)" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500 text-center text-slate-800 dark:text-slate-100">
+                            <input type="text" name="col_room" value="رقم الغرفة" placeholder="اسم عمود (الغرفة)" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500 text-center text-slate-800 dark:text-slate-100">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold transition shadow-lg">بدء الاستيراد الآن</button>
+                    <button type="button" onclick="toggleModal('importStudentsModal')" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-xl font-bold transition text-center">إلغاء</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
 {% endblock %}
 
 {% block scripts %}
 <script>
+    // دالة إظهار وإخفاء النوافذ المنبثقة لإصلاح العطل الرئيسي
+    function toggleModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+    }
+
+    // دالة فتح نافذة التعديل وإسناد القيم المقروءة من سطر الجدول
     function openEditModal(buttonElement) {
         const id = buttonElement.getAttribute('data-id');
         const name = buttonElement.getAttribute('data-name');
@@ -287,13 +303,13 @@
         toggleModal('editStudentModal');
     }
 
+    // دالة تصفية الجدول الفورية
     function filterTable() {
-        const searchVal = document.getElementById('searchInput').value.toLowerCase();
+        const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
         const aptVal = document.getElementById('aptFilter').value;
         const rows = document.querySelectorAll('.student-row');
         
         rows.forEach(row => {
-            // استخدمنا (|| '') كحماية لتجنب أخطاء null في حال لم يقرأ المتصفح الاسم
             const studentName = row.getAttribute('data-name') || '';
             const matchSearch = studentName.toLowerCase().includes(searchVal);
             
@@ -304,9 +320,7 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', filterTable);
-
+    // تهيئة الجدول عند التحميل لضمان الاستجابة الصحيحة
     document.addEventListener('DOMContentLoaded', filterTable);
 </script>
 {% endblock %}
-

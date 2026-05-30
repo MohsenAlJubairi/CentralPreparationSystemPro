@@ -31,7 +31,6 @@ def check_and_notify():
             
             print(f"يجب إرسال تنبيه إلى: {mandoob.username} - شقة: {apt}")
             
-            # (هنا سنضع كود إرسال رسالة التيليجرام لاحقاً)
 
 if __name__ == '__main__':
     check_and_notify()

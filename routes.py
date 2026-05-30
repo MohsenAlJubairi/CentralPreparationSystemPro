@@ -784,15 +784,14 @@ def register_routes(app):
                         subscription_info=sub_info,
                         data=json.dumps({
                             "title": "🚨 تذكير هام من الإدارة!",
-                            "body": f"يا {mandoob.name}، لم تقم برفع تحضير شقتك حتى الآن. يرجى الدخول للنظام فوراً."
+                            "body": f"يا {mandoob.username}، لم تقم برفع تحضير شقتك حتى الآن. يرجى الدخول للنظام فوراً."
                         }),
                         vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
-                        vapid_claims={"sub": app.config['VAPID_CLAIM_EMAIL']}
-                    )
+                        vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL']}                    )
                     notifications_sent += 1
                     
                 except WebPushException as ex:
-                    print(f"فشل إرسال الإشعار للمندوب {mandoob.name}: {repr(ex)}")
+                    print(f"فشل إرسال الإشعار للمندوب {mandoob.username}: {repr(ex)}")
                     # (اختياري) يمكنك حذف الاشتراك من قاعدة البيانات إذا انتهت صلاحيته
                     # db.session.delete(sub)
                     # db.session.commit()
