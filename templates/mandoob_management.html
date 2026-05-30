@@ -59,6 +59,7 @@
                         <th class="p-4 font-medium">اسم المستخدم</th>
                         <th class="p-4 font-medium">الشقة الحالية</th>
                         <th class="p-4 font-medium">الحالة</th>
+                        <th class="p-4 font-medium text-center">الإشعارات</th>
                         <th class="p-4 font-medium text-center">الإجراءات</th>
                     </tr>
                 </thead>
@@ -87,6 +88,19 @@
                                 <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200">نشط</span>
                             {% else %}
                                 <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs font-bold border border-rose-200">معطل</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4 text-center">
+                            {% if mandoob.id in subscribed_ids %}
+                                <div class="inline-flex items-center gap-1.5 bg-cyan-50 text-cyan-600 px-3 py-1.5 rounded-xl text-xs font-bold border border-cyan-200 shadow-sm" title="يستقبل الإشعارات">
+                                    <i class="fa-solid fa-bell text-cyan-500"></i>
+                                    <span>مفعل</span>
+                                </div>
+                            {% else %}
+                                <div class="inline-flex items-center gap-1.5 text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-100" title="لم يقم بتفعيل الإشعارات">
+                                    <i class="fa-solid fa-bell-slash"></i>
+                                    <span>غير مفعل</span>
+                                </div>
                             {% endif %}
                         </td>
                         <td class="p-4 rounded-l-2xl text-center">

@@ -402,8 +402,13 @@ def register_routes(app):
             Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])
         ).order_by(Student.apartment_number, Student.room_number).all()
         
-        return render_template('mandoob_management.html', mandoobs=all_mandoobs)
+        # --- التعديل هنا: استخراج الأرقام بشكل صريح ومباشر ---
+        subscriptions = PushSubscription.query.all()
+        subscribed_ids = [sub.user_id for sub in subscriptions]
+        # ----------------------------------------------------
 
+        return render_template('mandoob_management.html', mandoobs=all_mandoobs, subscribed_ids=subscribed_ids)
+    
     @app.route('/toggle_mandoob/<int:user_id>')
     @login_required
     def toggle_mandoob(user_id):

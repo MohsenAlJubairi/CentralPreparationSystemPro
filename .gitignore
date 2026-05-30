@@ -15,3 +15,5 @@ instance/
 
 # ملفات البيئة السرية
 .env
+
+node_modules/
