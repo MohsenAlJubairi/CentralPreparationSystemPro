@@ -409,6 +409,46 @@ def register_routes(app):
 
         return render_template('mandoob_management.html', mandoobs=all_mandoobs, subscribed_ids=subscribed_ids)
     
+    @app.route('/send_custom_notification', methods=['POST'])
+    @login_required
+    def send_custom_notification():
+        if current_user.role != 'admin':
+            return "غير مصرح", 403
+            
+        user_id = request.form.get('user_id')
+        title = request.form.get('title', 'تنبيه من الإدارة')
+        body = request.form.get('body')
+        
+        subs = PushSubscription.query.filter_by(user_id=user_id).all()
+        if not subs:
+            flash('هذا المندوب لم يفعل الإشعارات بعد.', 'error')
+            return redirect(url_for('manage_mandoobs'))
+            
+        success_count = 0
+        for sub in subs:
+            try:
+                sub_info = json.loads(sub.subscription_json)
+                webpush(
+                    subscription_info=sub_info,
+                    data=json.dumps({
+                        "title": title,
+                        "body": body
+                    }),
+                    vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
+                    # التعديل هنا: إضافة "mailto:"
+                    vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL']}
+                )
+                success_count += 1
+            except WebPushException as ex:
+                print(f"فشل إرسال الإشعار: {repr(ex)}")
+                
+        if success_count > 0:
+            flash('تم إرسال الإشعار للمندوب بنجاح!', 'success')
+        else:
+            flash('فشل إرسال الإشعار، قد يكون اشتراك المندوب منتهياً.', 'error')
+            
+        return redirect(url_for('manage_mandoobs'))
+        
     @app.route('/toggle_mandoob/<int:user_id>')
     @login_required
     def toggle_mandoob(user_id):
@@ -747,7 +787,17 @@ def register_routes(app):
             
         return jsonify({'status': 'تم تفعيل الإشعارات بنجاح!'})
 
-
+    @app.route('/unsubscribe', methods=['POST'])
+    @login_required
+    def unsubscribe():
+        if current_user.role != 'mandoob':
+            return jsonify({'error': 'غير مصرح'}), 403
+            
+        # حذف جميع اشتراكات هذا المندوب
+        PushSubscription.query.filter_by(user_id=current_user.id).delete()
+        db.session.commit()
+        
+        return jsonify({'status': 'تم إلغاء تفعيل الإشعارات.'})
     # -------------------------------------------------------------------------
     # مسار المهام المجدولة (يُستدعى يومياً عبر cron-job.org)
     # -------------------------------------------------------------------------
@@ -792,14 +842,15 @@ def register_routes(app):
                             "body": f"يا {mandoob.username}، لم تقم برفع تحضير شقتك حتى الآن. يرجى الدخول للنظام فوراً."
                         }),
                         vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
-                        vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL']}                    )
+                        vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL']})
                     notifications_sent += 1
                     
                 except WebPushException as ex:
                     print(f"فشل إرسال الإشعار للمندوب {mandoob.username}: {repr(ex)}")
                     # (اختياري) يمكنك حذف الاشتراك من قاعدة البيانات إذا انتهت صلاحيته
-                    # db.session.delete(sub)
-                    # db.session.commit()
+                    if ex.response and ex.response.status_code in [404, 410]:
+                        db.session.delete(sub)
+                        db.session.commit()
                     
         return f"تم الفحص: يوجد {len(lazy_mandoobs)} مندوب متأخر، وتم إرسال {notifications_sent} إشعار بنجاح.", 200
 

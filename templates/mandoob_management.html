@@ -102,9 +102,19 @@
                                     <span>غير مفعل</span>
                                 </div>
                             {% endif %}
+
                         </td>
                         <td class="p-4 rounded-l-2xl text-center">
                             <div class="flex justify-center gap-2">
+                                {% if mandoob.id in subscribed_ids %}
+                                <button type="button" 
+                                        onclick="openNotifyModal('{{ mandoob.id }}', '{{ mandoob.name }}')"
+                                        title="إرسال إشعار للمندوب"
+                                        class="px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                                {% endif %}
+
                                 <button type="button" 
                                         data-id="{{ mandoob.id }}" 
                                         data-name="{{ mandoob.name }}"
@@ -119,8 +129,9 @@
                                    {% if mandoob.is_active %}bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white{% else %}bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white{% endif %}">
                                      {% if mandoob.is_active %}<i class="fa-solid fa-power-off ml-1"></i> تعطيل{% else %}<i class="fa-solid fa-check ml-1"></i> تفعيل{% endif %}
                                 </a>
+                                
                             </div>
-                        </td>
+                        </td>                        
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -143,6 +154,31 @@
                 <div class="flex gap-3 pt-2">
                     <button type="submit" class="flex-1 bg-primary hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-blue-200/50">حفظ وتشفير</button>
                     <button type="button" onclick="closePasswordModal()" class="flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 py-3 rounded-xl font-bold transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="notifyModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative">
+            <div class="p-5 border-b border-slate-200 flex justify-between">
+                <h3 class="font-bold text-lg text-purple-600"><i class="fa-solid fa-bell"></i> إرسال إشعار مباشر</h3>
+                <button onclick="closeNotifyModal()" class="text-rose-500 hover:text-rose-700 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <form action="{{ url_for('send_custom_notification') }}" method="POST" class="p-6 space-y-4">
+                <input type="hidden" name="user_id" id="notifyUserId">
+                <div>
+                    <p class="text-sm text-slate-500 mb-3 font-bold">إلى المندوب: <strong id="notifyUserName" class="text-slate-800"></strong></p>
+                    
+                    <label class="block text-xs font-bold mb-1 text-slate-600">عنوان الإشعار</label>
+                    <input type="text" name="title" value="تنبيه من الإدارة 🚨" required class="w-full mb-3 bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:border-purple-500 font-bold text-sm">
+                    
+                    <label class="block text-xs font-bold mb-1 text-slate-600">نص الرسالة</label>
+                    <textarea name="body" required placeholder="اكتب رسالتك هنا..." rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:border-purple-500 font-bold text-sm resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-purple-200/50 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> إرسال
+                    </button>
                 </div>
             </form>
         </div>
@@ -175,13 +211,6 @@
     document.addEventListener('DOMContentLoaded', filterTable);
 
     // دوال النافذة المنبثقة
-    function openPasswordModal(userId, userName) {
-        document.getElementById('resetPasswordForm').action = '/reset_password/' + userId;
-        document.getElementById('modalUserName').innerText = userName;
-        document.getElementById('resetPasswordModal').classList.remove('hidden');
-        document.getElementById('resetPasswordModal').classList.add('flex');
-    }
-
     function openPasswordModal(element) {
         // جلب البيانات من الزر نفسه بطريقة آمنة لا تزعج المحرر
         let userId = element.getAttribute('data-id');
@@ -191,6 +220,17 @@
         document.getElementById('modalUserName').innerText = userName;
         document.getElementById('resetPasswordModal').classList.remove('hidden');
         document.getElementById('resetPasswordModal').classList.add('flex');
+    }
+    function openNotifyModal(userId, userName) {
+        document.getElementById('notifyUserId').value = userId;
+        document.getElementById('notifyUserName').innerText = userName;
+        document.getElementById('notifyModal').classList.remove('hidden');
+        document.getElementById('notifyModal').classList.add('flex');
+    }
+
+    function closeNotifyModal() {
+        document.getElementById('notifyModal').classList.add('hidden');
+        document.getElementById('notifyModal').classList.remove('flex');
     }
 </script>
 {% endblock %}

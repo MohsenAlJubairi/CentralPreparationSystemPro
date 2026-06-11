@@ -43,11 +43,17 @@
                 <p class="text-slate-500 font-bold flex items-center gap-2">
                     <i class="fa-solid fa-building text-cyan-600"></i> مندوب شقة ({{ apt_num }})
                 </p>
-                {% if not has_push_sub %}
-                <button id="enable-notifications-btn" onclick="subscribeToNotifications()" class="mb-4 bg-cyan-100 text-cyan-700 border border-cyan-300 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-cyan-200 transition">
-                    <i class="fa-solid fa-bell"></i> تفعيل إشعارات التذكير بالتحضير
-                </button>
-                {% endif %}
+                <div class="mb-4">
+                    {% if has_push_sub %}
+                    <button onclick="unsubscribeFromNotifications()" class="bg-rose-100 text-rose-700 border border-rose-300 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-rose-200 transition">
+                        <i class="fa-solid fa-bell-slash"></i> إلغاء تفعيل إشعارات التحضير
+                    </button>
+                    {% else %}
+                    <button id="enable-notifications-btn" onclick="subscribeToNotifications()" class="bg-cyan-100 text-cyan-700 border border-cyan-300 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-cyan-200 transition">
+                        <i class="fa-solid fa-bell"></i> تفعيل إشعارات التذكير بالتحضير
+                    </button>
+                    {% endif %}
+                </div>
             </div>
         </div>       
 
@@ -330,11 +336,8 @@
 
                 if(response.ok) {
                     alert('تم تفعيل الإشعارات بنجاح! سيتم تنبيهك إذا نسيت التحضير.');
-                    const btn = document.getElementById('enable-notifications-btn');
-                    // التحقق من وجود الزر قبل محاولة إخفائه
-                    if (btn) {
-                        btn.style.display = 'none';
-                    }
+                    location.reload(); // تحديث الصفحة لإظهار زر التفعيل مجدداً
+
                 } else {
                     alert('حدث خطأ أثناء الحفظ في قاعدة البيانات.');
                 }
@@ -348,6 +351,24 @@
         }
     }
 
+    async function unsubscribeFromNotifications() {
+        if ('serviceWorker' in navigator) {
+            try {
+                const reg = await navigator.serviceWorker.ready;
+                const subscription = await reg.pushManager.getSubscription();
+                if (subscription) {
+                    await subscription.unsubscribe();
+                    const response = await fetch('/unsubscribe', { method: 'POST' });
+                    if (response.ok) {
+                        alert('تم إلغاء تفعيل الإشعارات بنجاح.');
+                        location.reload(); // تحديث الصفحة لإظهار زر التفعيل مجدداً
+                    }
+                }
+            } catch (error) {
+                console.error('فشل إلغاء الاشتراك:', error);
+            }
+        }
+    }
     // تشغيل دالة الفحص فور تحميل الصفحة
     document.addEventListener("DOMContentLoaded", checkSubscription);
 
