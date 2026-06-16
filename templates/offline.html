@@ -1,29 +1,88 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>غير متصل بالإنترنت</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>غير متصل بالإنترنت | إدارة السكن</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/css/style.css">
     
+    <style>
+        body { font-family: 'Tajawal', sans-serif; }
+        
+        /* تأثير التصميم الزجاجي الاحترافي */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        
+        /* حركة الطفو الناعمة للأيقونة */
+        .float-anim {
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* لمعان الزر */
+        @keyframes shine {
+            100% { transform: translateX(100%); }
+        }
+    </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white rounded-3xl p-10 shadow-sm border border-slate-200 text-center max-w-md w-full">
-        <div class="w-24 h-24 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-inner relative">
-            <i class="fa-solid fa-wifi"></i>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="w-full h-1 bg-slate-400 transform -rotate-45"></div>
+<body class="bg-slate-50 dark:bg-[#080d1a] text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+    <div class="absolute top-1/4 right-1/4 w-72 h-72 bg-cyan-500/20 dark:bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-1/4 left-1/4 w-96 h-96 bg-purple-500/20 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="glass-card rounded-[2rem] p-10 shadow-2xl max-w-md w-full text-center relative z-10 transform transition-all hover:scale-[1.02] duration-300">
+        
+        <div class="float-anim relative w-32 h-32 mx-auto mb-8">
+            <div class="absolute inset-0 bg-rose-500/20 dark:bg-rose-500/10 rounded-full animate-ping opacity-75"></div>
+            
+            <div class="relative w-full h-full bg-gradient-to-br from-white to-rose-50 dark:from-slate-800 dark:to-slate-900 rounded-full flex items-center justify-center border-4 border-white dark:border-slate-700 shadow-xl overflow-hidden">
+                <i class="fa-solid fa-wifi text-5xl text-rose-400 dark:text-rose-500 relative z-10"></i>
+                
+                <div class="absolute inset-0 flex items-center justify-center z-20">
+                    <div class="w-16 h-1.5 bg-rose-500 dark:bg-rose-600 transform -rotate-45 rounded-full border border-white dark:border-slate-800 shadow-sm"></div>
+                </div>
             </div>
         </div>
         
-        <h1 class="text-2xl font-extrabold text-slate-800 mb-2">أنت غير متصل بالإنترنت</h1>
-        <p class="text-slate-500 font-bold mb-8">يبدو أن هناك مشكلة في اتصالك بالشبكة. يرجى التحقق من الواي فاي أو بيانات الهاتف والمحاولة مجدداً.</p>
+        <h1 class="text-3xl font-extrabold mb-3 tracking-tight">
+            <span class="text-transparent bg-clip-text bg-gradient-to-l from-slate-800 to-slate-500 dark:from-white dark:to-slate-400">
+                أنت خارج التغطية
+            </span>
+        </h1>
         
-        <button onclick="window.location.reload()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2">
-            <i class="fa-solid fa-rotate-right"></i> تحديث الصفحة
+        <p class="text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed text-sm">
+            يبدو أن الإشارة قد انقطعت! 📡<br>
+            يرجى التحقق من اتصال الواي فاي أو بيانات الهاتف والمحاولة مرة أخرى. نحن في انتظارك.
+        </p>
+        
+        <button onclick="window.location.reload()" class="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-extrabold rounded-xl text-white bg-gradient-to-l from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-500/30 transition-all duration-300 active:scale-95 overflow-hidden">
+            <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-[shine_1.5s_ease-in-out_infinite]"></div>
+            
+            <div class="flex items-center gap-2 relative z-10">
+                <i class="fa-solid fa-rotate-right group-hover:rotate-180 transition-transform duration-500"></i> 
+                تحديث الصفحة
+            </div>
         </button>
+
+        <div class="mt-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] font-bold text-slate-400">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+            وضع عدم الاتصال (Offline Mode)
+        </div>
     </div>
+
 </body>
 </html>

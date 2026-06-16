@@ -26,7 +26,19 @@
     {% endif %}
 {% endwith %}
 <!-- نهاية منطقة عرض الرسائل -->
-
+<div class="mb-6 glass-panel p-6 rounded-2xl border border-purple-200 dark:border-purple-900/50 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-l from-purple-50 to-transparent dark:from-purple-900/10">
+    <div>
+        <h3 class="font-bold text-lg text-purple-800 dark:text-purple-300 flex items-center gap-2">
+            <i class="fa-solid fa-database text-purple-500"></i> الإدارة المتقدمة لقواعد البيانات (Flask-Admin)
+        </h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-bold">
+            الوصول المباشر للتحكم الشامل في الجداول (الطلاب، الحسابات، التحضير، الإشعارات) بصلاحيات المطور المطلقة.
+        </p>
+    </div>
+    <a href="/dev_admin" target="_blank" class="shrink-0 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl font-extrabold transition-all shadow-lg shadow-purple-600/30 flex items-center gap-2 hover:-translate-y-1 active:scale-95">
+        فتح لوحة البيانات <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i>
+    </a>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     <!-- نموذج إضافة حساب جديد -->
     <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm md:col-span-1 h-fit">
