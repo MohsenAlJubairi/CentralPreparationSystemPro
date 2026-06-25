@@ -60,7 +60,7 @@
             </select>
         </div>
         
-    <button onclick="toggleModal('addStudentModal')" class="flex-1 md:flex-none bg-primary hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
+    <button onclick="toggleModal('addStudentModal')" class="flex-1 md:flex-none bg-primary hover:bg-primary-600 text-white px-6 py-2.5 rounded-xl font-bold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2">
         <i class="fa-solid fa-user-plus"></i>
         <span>إضافة طالب</span>
     </button>
@@ -101,7 +101,7 @@
                             {% elif student.status == 'في إجازة' %}
                                 <span class="text-purple-700 bg-purple-100 px-3 py-1 rounded-full text-xs font-bold">في إجازة</span>
                             {% elif student.status == 'تخرج' %}
-                                <span class="text-blue-700 bg-blue-100 px-3 py-1 rounded-full text-xs font-bold">تخرج</span>
+                                <span class="text-primary-700 bg-primary-100 px-3 py-1 rounded-full text-xs font-bold">تخرج</span>
                             {% elif student.status == 'مفصول' %}
                                 <span class="text-rose-700 bg-rose-100 px-3 py-1 rounded-full text-xs font-bold">مفصول</span>
                             {% else %}
@@ -117,7 +117,7 @@
                                     data-status="{{ student.status }}"
                                     onclick="openEditModal(this)" 
                                     title="تعديل" 
-                                    class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition">
+                                    class="text-primary-500 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 p-2 rounded-lg transition">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                         </td>
@@ -163,7 +163,7 @@
                 </div>
                 
                 <div class="flex gap-3 pt-4">
-                    <button type="submit" class="flex-1 bg-primary hover:bg-blue-600 text-white py-3 rounded-xl font-bold transition">حفظ</button>
+                    <button type="submit" class="flex-1 bg-primary hover:bg-primary-600 text-white py-3 rounded-xl font-bold transition">حفظ</button>
                     <button type="button" onclick="toggleModal('addStudentModal')" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 py-3 rounded-xl font-bold transition">إلغاء</button>
                 </div>
             </form>
@@ -207,7 +207,7 @@
                     <select id="edit_status" name="status" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-amber-500 transition font-bold text-slate-800 dark:text-slate-100">
                         <option value="فعال" class="text-emerald-600">موجود (نشط)</option>
                         <option value="في إجازة" class="text-purple-600">في إجازة</option>
-                        <option value="تخرج" class="text-blue-600">تخرج</option>
+                        <option value="تخرج" class="text-primary-600">تخرج</option>
                         <option value="مفصول" class="text-rose-600">مفصول</option>
                     </select>
                 </div>

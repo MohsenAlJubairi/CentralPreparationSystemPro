@@ -1,5 +1,5 @@
 // تم تغيير رقم الإصدار لإجبار المتصفح على تحديث الكاش
-const CACHE_NAME = 'bazara-cache-v2';
+const CACHE_NAME = 'bazara-cache-v3';
 
 const urlsToCache = [
     '/static/manifest.json',

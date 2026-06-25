@@ -26,12 +26,12 @@ with app.app_context():
         
         print("✅ تمت العملية بنجاح!")
         print("-------------------------------")
-        print("👤 اسم المستخدم: {UserName}")
+        print(f"👤 اسم المستخدم: {UserName}")
         print("🔑 كلمة المرور: 123456")
         print("-------------------------------")
     else:
         # إذا كان الحساب موجوداً مسبقاً، سنقوم بتحديث صلاحياته وكلمة المرور فقط
-        existing_dev.role = 'developer'
-        existing_dev.password = generate_password_hash('123456', method='pbkdf2:sha256')
+        existing.role = 'developer'
+        existing.password = generate_password_hash('123456', method='pbkdf2:sha256')
         db.session.commit()
         print("⚠️ الحساب كان موجوداً! تم تحديثه ليصبح 'مطور' وتمت إعادة تعيين الباسورد إلى 123456")

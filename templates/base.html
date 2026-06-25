@@ -7,7 +7,7 @@
     
     <link rel="icon" href="{{ url_for('static', filename='Images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.2"> <!--change the v -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0"> <!--change the v -->
     <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">    
 
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -30,6 +30,14 @@
     </script>
 
     {% block extra_css %}{% endblock %}
+    <script>
+        // Apply dark mode immediately before render to prevent flash
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
 <body class="bg-slate-100 dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex">
 
@@ -39,7 +47,7 @@
         
         {% include 'components/header.html' %}
 
-        <div class="p-8 overflow-y-auto flex-1">
+        <div class="p-8 overflow-y-auto flex-1 animate-fade-in">
             {% block content %}{% endblock %}
         </div>
     </main>

@@ -121,15 +121,23 @@ def register_routes(app):
                 flash('حجم الملف كبير جداً! الحد الأقصى المسموح به هو 5 ميغابايت.', 'error')
                 return redirect(url_for('manage_students'))
                 
-            df = pd.read_excel(BytesIO(file_bytes))
-            df.columns = df.columns.str.strip()
+            import openpyxl
+            wb = openpyxl.load_workbook(filename=BytesIO(file_bytes), data_only=True)
+            sheet = wb.active
+            
+            headers = []
+            for cell in sheet[1]:
+                val = cell.value
+                headers.append(val.strip() if isinstance(val, str) else val)
 
-            if col_name not in df.columns or col_apt not in df.columns:
-                available_cols = " ، ".join(df.columns.astype(str))
+            if col_name not in headers or col_apt not in headers:
+                available_cols = " ، ".join([str(h) for h in headers if h is not None])
                 flash(f'خطأ: لم يتم العثور على عمود "{col_name}" أو "{col_apt}". الأعمدة الموجودة في ملفك هي: ({available_cols})', 'error')
                 return redirect(url_for('manage_students'))
 
-            df.dropna(how='all', inplace=True)
+            name_idx = headers.index(col_name)
+            apt_idx = headers.index(col_apt)
+            room_idx = headers.index(col_room) if col_room in headers else -1
 
             if import_mode == 'clear':
                 Student.query.update({'status': 'مفصول'})
@@ -138,18 +146,21 @@ def register_routes(app):
                 flash('تم أرشفة العام السابق بنجاح.', 'info')
 
             added_count = 0
-            for _, row in df.iterrows():
-                f_name = str(row.get(col_name, '')).strip()
-                a_num = row.get(col_apt)
-                r_num = row.get(col_room)
+            for row in sheet.iter_rows(min_row=2, values_only=True):
+                if not row or not any(row):
+                    continue
 
-                if pd.isna(a_num) or not f_name or f_name.lower() in ['nan', 'none', 'null', '']: 
+                f_name = str(row[name_idx]).strip() if len(row) > name_idx and row[name_idx] is not None else ''
+                a_num = row[apt_idx] if len(row) > apt_idx else None
+                r_num = row[room_idx] if room_idx != -1 and len(row) > room_idx else None
+
+                if a_num is None or not f_name or f_name.lower() in ['nan', 'none', 'null', '']: 
                     continue
 
                 try:
                     apt_val = int(float(a_num))
-                    room_val = int(float(r_num)) if pd.notna(r_num) and str(r_num).strip() != '' else 0
-                except ValueError:
+                    room_val = int(float(r_num)) if r_num is not None and str(r_num).strip() != '' else 0
+                except (ValueError, TypeError):
                     continue
 
                 new_student = Student(full_name=f_name, apartment_number=apt_val, room_number=room_val, status='فعال')
@@ -436,7 +447,7 @@ def register_routes(app):
                     }),
                     vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
                     # التعديل هنا: إضافة "mailto:"
-                    vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL']}
+                    vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL'].replace('mailto:', '')}
                 )
                 success_count += 1
             except WebPushException as ex:
@@ -612,7 +623,7 @@ def register_routes(app):
         yemen_tz = timezone(timedelta(hours=3))
         now_in_yemen = datetime.now(yemen_tz)
         current_hour = now_in_yemen.hour
-        is_allowed_time = (current_hour >= 18) or (current_hour < 3)
+        is_allowed_time = (current_hour >= 18) or (current_hour < 6)
         
         # 🌟 استخدام التاريخ المنطقي بشكل صحيح 🌟
         logical_today = (now_in_yemen - timedelta(hours=3)).date()
@@ -679,7 +690,7 @@ def register_routes(app):
         yemen_tz = timezone(timedelta(hours=3))
         now_in_yemen = datetime.now(yemen_tz)
         current_hour = now_in_yemen.hour
-        is_allowed_time = (current_hour >= 18) or (current_hour < 3)
+        is_allowed_time = (current_hour >= 18) or (current_hour < 6)
         
         # إذا لم يكن الوقت مسموحاً، ولم يقم الإداري بفتح صلاحية تغيير التاريخ
         if not is_allowed_time and not allow_date:
@@ -842,7 +853,7 @@ def register_routes(app):
                             "body": f"يا {mandoob.username}، لم تقم برفع تحضير شقتك حتى الآن. يرجى الدخول للنظام فوراً."
                         }),
                         vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
-                        vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL']})
+                        vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL'].replace('mailto:', '')})
                     notifications_sent += 1
                     
                 except WebPushException as ex:

@@ -2,17 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply antialiased;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/40 shadow-soft;
+  }
+  .dark .glass-panel {
+    @apply bg-slate-900/80 border-slate-700/50 shadow-[0_8px_30px_rgb(0,0,0,0.12)];
+  }
+  .text-glow {
+    text-shadow: 0 0 10px rgba(249, 115, 22, 0.5);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-slate-800 rounded-full;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-600 rounded-full transition-colors;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400 dark:bg-slate-500;
+}
+
 /* إجبار Tailwind على احترام خطوط وأوزان FontAwesome */
 .fa-solid, .fas {
     font-family: "Font Awesome 6 Free" !important;
     font-weight: 900 !important;
 }
-
 .fa-regular, .far {
     font-family: "Font Awesome 6 Free" !important;
     font-weight: 400 !important;
 }
-
 .fa-brands, .fab {
     font-family: "Font Awesome 6 Brands" !important;
     font-weight: 400 !important;

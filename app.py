@@ -8,17 +8,21 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 import os
 
+from dotenv import load_dotenv
+# تحميل متغيرات البيئة من ملف .env
+load_dotenv()
+
 # تحديد المسار الدقيق للمشروع على جهازك
 app = Flask(__name__)
 
 # إعدادات Web Push Notifications
-app.config['VAPID_PUBLIC_KEY'] =  'BGKcO7m8HS9JfRP7S6I3aKEm-Zzu8optzsN_C8IzXv2e35OxzsvlL46Ya2oZGDVx1YSQgjS51QOSyH6Vlmo9Vrs'
-app.config['VAPID_PRIVATE_KEY'] = 'gKtVzn7uAF25e1PqW4pna2l4CEEfWOnZX5MH1jyGo0M'
-app.config['VAPID_CLAIM_EMAIL'] = 'mailto:ga@gmail.com' 
+app.config['VAPID_PUBLIC_KEY'] = os.environ.get('VAPID_PUBLIC_KEY', '')
+app.config['VAPID_PRIVATE_KEY'] = os.environ.get('VAPID_PRIVATE_KEY', '')
+app.config['VAPID_CLAIM_EMAIL'] = os.environ.get('VAPID_CLAIM_EMAIL', '') 
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'instance', 'dormitory.db')
-app.config['SECRET_KEY'] = 'super_secret_key_123'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_fallback')
 
 # 1. ربط قاعدة البيانات بالتطبيق
 db.init_app(app)

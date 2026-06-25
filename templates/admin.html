@@ -14,7 +14,7 @@
                 <p class="text-slate-500 text-xs font-bold mb-1">الطلاب الفعليون</p>
                 <h3 class="text-2xl font-bold">{{ total_students }}</h3>
             </div>
-            <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-lg">
+            <div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-lg">
                 <i class="fa-solid fa-users"></i>
             </div>
         </div>
@@ -101,7 +101,7 @@
                 </select>
             </div>
             <div class="flex items-end gap-2">
-                <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-blue-600 transition shadow-sm">تطبيق الفلتر</button>
+                <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold w-full hover:bg-primary-600 transition shadow-sm">تطبيق الفلتر</button>
                 <a href="{{ url_for('admin_dashboard') }}" title="إلغاء الفلاتر" class="bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-lg text-sm font-bold hover:bg-rose-500 hover:text-white transition shadow-sm text-center">
                     <i class="fa-solid fa-rotate-right"></i>
                 </a>
@@ -113,7 +113,7 @@
                 <label class="block text-xs font-bold text-slate-500 mb-2">الشقق (يمكن اختيار أكثر من شقة)</label>
                 <div class="flex flex-wrap gap-2">
                     {% for i in range(2, 13) %}
-                    <label class="inline-flex items-center bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md px-3 py-1.5 text-xs font-bold cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition has-[:checked]:bg-blue-100 has-[:checked]:border-blue-500 has-[:checked]:text-blue-800 dark:has-[:checked]:bg-blue-900/50 dark:has-[:checked]:text-blue-300">
+                    <label class="inline-flex items-center bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md px-3 py-1.5 text-xs font-bold cursor-pointer hover:bg-primary-50 hover:border-primary-300 transition has-[:checked]:bg-primary-100 has-[:checked]:border-primary-500 has-[:checked]:text-primary-800 dark:has-[:checked]:bg-primary-900/50 dark:has-[:checked]:text-primary-300">
                         <input type="checkbox" name="apartments" value="{{ i }}" class="hidden" {% if i|string in selected_apts %}checked{% endif %}>
                         {{ i }}
                     </label>
@@ -124,7 +124,7 @@
                 <label class="block text-xs font-bold text-slate-500 mb-2">الغرف (يمكن اختيار أكثر من غرفة)</label>
                 <div class="flex flex-wrap gap-2">
                     {% for i in range(1, 6) %}
-                    <label class="inline-flex items-center bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md px-3 py-1.5 text-xs font-bold cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition has-[:checked]:bg-blue-100 has-[:checked]:border-blue-500 has-[:checked]:text-blue-800 dark:has-[:checked]:bg-blue-900/50 dark:has-[:checked]:text-blue-300">
+                    <label class="inline-flex items-center bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-md px-3 py-1.5 text-xs font-bold cursor-pointer hover:bg-primary-50 hover:border-primary-300 transition has-[:checked]:bg-primary-100 has-[:checked]:border-primary-500 has-[:checked]:text-primary-800 dark:has-[:checked]:bg-primary-900/50 dark:has-[:checked]:text-primary-300">
                         <input type="checkbox" name="rooms" value="{{ i }}" class="hidden" {% if i|string in selected_rooms %}checked{% endif %}>
                         {{ i }}
                     </label>

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة المندوب - التحضير اليومي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0">
     <style>
-        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Tajawal', sans-serif; }
         /* إخفاء شريط التمرير للحفاظ على نظافة التصميم */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
@@ -16,8 +16,40 @@
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+
+    <!-- PWA Settings -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#f97316">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="سكن بازرعة">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='Images/logo.png') }}">
+    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='Images/logo.png') }}">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('Service Worker Failed', err));
+            });
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="text-slate-800 pb-20">
+<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 pb-20 transition-colors duration-500">
+
+    <!-- Theme Toggle Button -->
+    <button onclick="toggleDarkMode()" class="fixed top-6 left-6 z-50 w-12 h-12 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-slate-700/50 shadow-soft flex items-center justify-center text-slate-600 dark:text-amber-400 hover:scale-110 transition-all">
+        <i id="theme-icon" class="fa-solid fa-moon text-xl"></i>
+    </button>
 
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -34,14 +66,14 @@
       {% endif %}
     {% endwith %}
 
-    <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 fade-in relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 fade-in relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 dark:bg-primary-500/5 rounded-full blur-3xl"></div>
         
         <div class="flex items-center gap-4 relative z-10 w-full md:w-auto justify-between md:justify-start">
             <div>
-                <h1 class="text-2xl font-extrabold text-slate-800 mb-1">مرحباً، {{ current_user.name }}</h1>
-                <p class="text-slate-500 font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-building text-cyan-600"></i> مندوب شقة ({{ apt_num }})
+                <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white mb-1">مرحباً، {{ current_user.name }}</h1>
+                <p class="text-slate-500 dark:text-slate-400 font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-building text-amber-600"></i> مندوب شقة ({{ apt_num }})
                 </p>
                 <div class="mb-4">
                     {% if has_push_sub %}
@@ -49,7 +81,7 @@
                         <i class="fa-solid fa-bell-slash"></i> إلغاء تفعيل إشعارات التحضير
                     </button>
                     {% else %}
-                    <button id="enable-notifications-btn" onclick="subscribeToNotifications()" class="bg-cyan-100 text-cyan-700 border border-cyan-300 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-cyan-200 transition">
+                    <button id="enable-notifications-btn" onclick="subscribeToNotifications()" class="bg-amber-100 text-amber-700 border border-amber-300 px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-amber-200 transition">
                         <i class="fa-solid fa-bell"></i> تفعيل إشعارات التذكير بالتحضير
                     </button>
                     {% endif %}
@@ -58,9 +90,9 @@
         </div>       
 
         <div class="flex items-center gap-3 w-full md:w-auto justify-between">
-            <div class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl font-bold text-sm flex flex-col items-center shadow-inner border border-slate-200">
+            <div class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl font-bold text-sm flex flex-col items-center shadow-inner border border-slate-200 dark:border-slate-700">
                 <span id="current-date">{{ today.strftime('%Y-%m-%d') }}</span>
-                <span id="clock" class="text-cyan-600 font-extrabold">00:00:00</span>
+                <span id="clock" class="text-primary-600 dark:text-primary-400 font-extrabold">00:00:00</span>
             </div>
             <a href="{{ url_for('logout') }}" class="bg-rose-50 text-rose-600 hover:bg-rose-100 px-4 py-3 rounded-xl transition-colors duration-200 text-sm font-bold flex items-center gap-2 border border-rose-100">
                 <i class="fa-solid fa-power-off"></i> خروج
@@ -68,14 +100,14 @@
         </div>
     </div>
 
-    <div class="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/20 mb-8 overflow-hidden">
+    <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/20 dark:border-slate-700 mb-8 overflow-hidden">
     <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
             <i class="fa-solid fa-fire text-orange-500 animate-pulse"></i>
             سلسلة الانضباط
         </h3>
-        <span class="text-xs font-medium bg-slate-100 text-slate-500 px-3 py-1 rounded-full">
-            تحديث تلقائي 3:00 AM
+        <span class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-3 py-1 rounded-full">
+            تحديث تلقائي 6:00 AM
         </span>
     </div>
 
@@ -131,10 +163,10 @@
             </div>
             <h2 class="text-2xl font-extrabold text-slate-800 mb-2">النظام مغلق حالياً</h2>
             <p class="text-slate-600 mb-2 font-bold">عذراً، يفتح نظام التحضير أبوابه يومياً في الأوقات التالية فقط:</p>
-            <div class="inline-block bg-white border border-rose-100 px-6 py-3 rounded-xl shadow-sm mt-2">
-                <span class="text-rose-600 font-extrabold text-lg">6:00 مساءً</span>
+            <div class="inline-block bg-white dark:bg-slate-800 border border-rose-100 dark:border-rose-900/50 px-6 py-3 rounded-xl shadow-sm mt-2">
+                <span class="text-rose-600 dark:text-rose-400 font-extrabold text-lg">6:00 مساءً</span>
                 <span class="text-slate-400 font-bold mx-2">إلى</span>
-                <span class="text-rose-600 font-extrabold text-lg">3:00 فجراً</span>
+                <span class="text-rose-600 dark:text-rose-400 font-extrabold text-lg">6:00 صباحاً</span>
             </div>
             <p class="text-sm text-slate-500 mt-6"><i class="fa-solid fa-circle-info"></i> إذا واجهتك مشكلة، يرجى مراجعة إدارة السكن.</p>
         </div>
@@ -166,22 +198,20 @@
                         {% set current_status = 'حاضر' %}
                     {% endif %}
 
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 hover:border-cyan-300 transition-colors duration-300">
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-soft transition-all duration-300">
                         
-                        <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                        <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100 dark:border-slate-700">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-extrabold shadow-inner">
+                                <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-300 font-extrabold shadow-inner">
                                     {{ loop.index }}
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-lg text-slate-800 leading-none mb-1">{{ student.full_name }}</h3>
-                                    <p class="text-sm text-slate-500 font-bold flex items-center gap-1">
                                         <i class="fa-solid fa-door-open text-slate-400"></i> غرفة: <span class="text-slate-700">{{ student.room_number }}</span>
                                     </p>
                                 </div>
                             </div>
 
-                            <button type="button" onclick="toggleNote('{{ student.id }}')" class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors">
+                            <button type="button" onclick="toggleNote('{{ student.id }}')" class="w-10 h-10 rounded-full bg-primary-50 text-primary-600 hover:bg-primary-100 flex items-center justify-center transition-colors">
                                 <i class="fa-regular fa-comment-dots text-lg"></i>
                             </button>
                         </div>
@@ -221,7 +251,7 @@
                                 <input type="text" name="note_{{ student.id }}" 
                                     value="{{ att_dict_notes.get(student.id, '') if att_dict_notes else '' }}"
                                     placeholder="اكتب ملاحظة (مثال: لديه عذر طبي، مسافر...)" 
-                                    class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pr-10 p-2.5 font-bold outline-none transition-all">
+                                    class="bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-primary-500 block w-full pr-10 p-2.5 font-bold outline-none transition-all">
                             </div>
                         </div>
                     </div>
@@ -229,7 +259,7 @@
             </div>
 
             <div class="sticky bottom-4 mt-8">
-                <button type="submit" class="w-full bg-gradient-to-l from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-lg py-4 rounded-2xl shadow-xl shadow-cyan-600/30 flex justify-center items-center gap-3 transition-transform active:scale-[0.98]">
+                <button type="submit" class="w-full bg-gradient-to-l from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold text-lg py-4 rounded-2xl shadow-xl shadow-amber-600/30 flex justify-center items-center gap-3 transition-transform active:scale-[0.98]">
                     <i class="fa-solid fa-paper-plane text-xl"></i> اعتماد كشف التحضير
                 </button>
             </div>

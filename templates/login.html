@@ -5,27 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول - نظام بازرعه للطالب الجامعي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
-    </script>
-    
-    <style>
-        body { font-family: 'Tajawal', sans-serif; }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0">
+    <!-- PWA Settings -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#f97316">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="سكن بازرعة">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='Images/logo.png') }}">
+    <link rel="apple-touch-startup-image" href="{{ url_for('static', filename='Images/logo.png') }}">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('Service Worker Failed', err));
+            });
         }
-        .dark .glass-panel { background: rgba(30, 41, 59, 0.85); }
-    </style>
+    </script>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Apply dark mode immediately
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body class="bg-slate-100 dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center relative overflow-hidden">
+<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-500">
 
-    <div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-blue-400/30 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-emerald-400/20 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- Wow Factor: Imaginary Glowing Orbs -->
+    <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary-500/20 dark:bg-primary-600/20 rounded-full blur-[100px] pointer-events-none animate-pulse-slow"></div>
+    <div class="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+    <div class="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-purple-500/10 dark:bg-purple-600/20 rounded-full blur-[80px] pointer-events-none animate-pulse-slow" style="animation-delay: 2.5s;"></div>
+    <div class="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-emerald-500/10 dark:bg-emerald-600/10 rounded-full blur-[90px] pointer-events-none animate-pulse-slow" style="animation-delay: 0.5s;"></div>
 
-    <div class="glass-panel p-8 md:p-10 rounded-3xl border border-white dark:border-slate-700 shadow-2xl w-full max-w-md relative z-10 mx-4">
+    <!-- Theme Toggle Button -->
+    <button onclick="toggleDarkMode()" class="absolute top-6 left-6 z-50 w-12 h-12 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-slate-700/50 shadow-soft flex items-center justify-center text-slate-600 dark:text-amber-400 hover:scale-110 transition-all">
+        <i id="theme-icon" class="fa-solid fa-moon text-xl"></i>
+    </button>
+
+    <div class="glass-panel p-8 md:p-10 rounded-3xl border border-white dark:border-slate-700 shadow-2xl w-full max-w-md relative z-10 mx-4 animate-slide-up">
         
         <div class="text-center mb-8 flex flex-col items-center justify-center">
             <div class="mb-4">
@@ -76,7 +99,7 @@
                 </label>
             </div>
 
-            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white py-3.5 rounded-xl font-bold transition shadow-lg shadow-blue-500/30 flex justify-center items-center gap-2 text-lg mt-2">
+            <button type="submit" class="w-full bg-primary hover:bg-primary-600 text-white py-3.5 rounded-xl font-bold transition shadow-lg shadow-primary-500/30 flex justify-center items-center gap-2 text-lg mt-2">
                 <span>دخول</span>
                 <i class="fa-solid fa-arrow-right-to-bracket"></i>
             </button>
