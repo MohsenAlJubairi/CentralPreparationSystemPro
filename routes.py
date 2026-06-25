@@ -675,7 +675,8 @@ def register_routes(app):
                                att_dict=att_dict,
                                today=logical_today, # نمرر التاريخ المنطقي للواجهة
                                allow_date_change=allow_date,
-                               is_allowed_time=is_allowed_time)
+                               is_allowed_time=is_allowed_time,
+                               vapid_public_key=app.config.get('VAPID_PUBLIC_KEY', ''))
 
 
     @app.route('/submit_attendance', methods=['POST'])
