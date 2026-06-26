@@ -7,10 +7,12 @@ from routes import register_routes
 from flask_admin import Admin, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 import os
-
 from dotenv import load_dotenv
-# تحميل متغيرات البيئة من ملف .env
-load_dotenv()
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+# تحميل متغيرات البيئة من ملف .env في نفس مجلد app.py
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # تحديد المسار الدقيق للمشروع على جهازك
 app = Flask(__name__)
@@ -20,7 +22,6 @@ app.config['VAPID_PUBLIC_KEY'] = os.environ.get('VAPID_PUBLIC_KEY', '')
 app.config['VAPID_PRIVATE_KEY'] = os.environ.get('VAPID_PRIVATE_KEY', '')
 app.config['VAPID_CLAIM_EMAIL'] = os.environ.get('VAPID_CLAIM_EMAIL', '') 
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'instance', 'dormitory.db')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default_secret_fallback')
 
