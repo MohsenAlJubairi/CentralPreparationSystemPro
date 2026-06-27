@@ -22,7 +22,12 @@
     <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full">
         
         <div class="p-5 border-b border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex flex-wrap gap-4 justify-between items-center">
-            <h3 class="font-bold text-xl text-primary"><i class="fa-solid fa-users ml-2"></i>طلاب شقة {{ apt_num }}</h3>
+            <div class="flex items-center gap-4">
+                <h3 class="font-bold text-xl text-primary"><i class="fa-solid fa-users ml-2"></i>طلاب شقة {{ apt_num }}</h3>
+                <a href="{{ url_for('admin_apartment_attendance', apt_num=apt_num) }}" class="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-200 dark:hover:bg-primary-900/50 transition flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-clipboard-user"></i> تحضير الشقة (إدارة)
+                </a>
+            </div>
             
             <div class="relative w-full md:w-72">
                 <input type="text" id="searchStudent" placeholder="بحث باسم الطالب..." class="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl py-2 pr-10 pl-4 outline-none focus:border-primary transition text-sm">

@@ -202,7 +202,7 @@ def register_routes(app):
             
         today = date.today()
         
-        total_students = Student.query.filter(Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])).count()
+        total_students = Student.query.filter(Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])).count()
         present_count = Attendance.query.filter_by(date=today, status='حاضر').count()
         absent_count = Attendance.query.filter_by(date=today, status='غائب').count()
         excused_count = Attendance.query.filter_by(date=today, status='مستأذن').count()
@@ -224,7 +224,7 @@ def register_routes(app):
         dates = [d[0] for d in dates_query]
         dates.sort() 
         
-        student_query = Student.query.filter(Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة']))
+        student_query = Student.query.filter(Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز']))
         if apt_filters:
             student_query = student_query.filter(Student.apartment_number.in_([int(a) for a in apt_filters]))
         if room_filters:
@@ -369,7 +369,7 @@ def register_routes(app):
         if current_user.role != 'admin':
             return redirect(url_for('mandoob_dashboard'))
        
-        students = Student.query.filter(Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])).order_by(Student.apartment_number, Student.room_number).all()
+        students = Student.query.filter(Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])).order_by(Student.apartment_number, Student.room_number).all()
         apartments_data = {i: {'count': 0, 'mandoob': None} for i in range(2, 13)}
         
         for student in students:
@@ -389,7 +389,7 @@ def register_routes(app):
        
         students = Student.query.filter(
             Student.apartment_number == apt_num,
-            Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])
+            Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])
         ).order_by(Student.room_number).all()
         
         mandoob = None
@@ -399,6 +399,105 @@ def register_routes(app):
                 break
                     
         return render_template('apartment_details.html', apt_num=apt_num, students=students, mandoob=mandoob)
+
+    @app.route('/admin/attendance/apartment/<int:apt_num>', methods=['GET'])
+    @login_required
+    def admin_apartment_attendance(apt_num):
+        if current_user.role != 'admin':
+            return redirect(url_for('mandoob_dashboard'))
+            
+        target_date_str = request.args.get('date')
+        if target_date_str:
+            target_date = datetime.strptime(target_date_str, '%Y-%m-%d').date()
+        else:
+            yemen_tz = timezone(timedelta(hours=3))
+            now_in_yemen = datetime.now(yemen_tz)
+            target_date = (now_in_yemen - timedelta(hours=3)).date()
+            
+        students = Student.query.filter(
+            Student.apartment_number == apt_num,
+            Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])
+        ).order_by(Student.room_number).all()
+        
+        existing_records = Attendance.query.filter(
+            Attendance.student_id.in_([s.id for s in students]),
+            Attendance.date == target_date
+        ).all()
+        
+        att_dict = {r.student_id: r.status for r in existing_records}
+        att_dict_notes = {r.student_id: r.note for r in existing_records}
+        
+        return render_template('admin_attendance.html', 
+                               apt_num=apt_num, 
+                               students=students, 
+                               target_date=target_date,
+                               att_dict=att_dict,
+                               att_dict_notes=att_dict_notes)
+
+    @app.route('/admin/submit_attendance/<int:apt_num>', methods=['POST'])
+    @login_required
+    def admin_submit_attendance(apt_num):
+        if current_user.role != 'admin':
+            return redirect(url_for('mandoob_dashboard'))
+            
+        record_date_str = request.form.get('record_date')
+        if not record_date_str:
+            flash('تاريخ التحضير غير صالح.', 'error')
+            return redirect(url_for('admin_apartment_attendance', apt_num=apt_num))
+            
+        record_date = datetime.strptime(record_date_str, '%Y-%m-%d').date()
+        
+        students_query = Student.query.filter_by(apartment_number=apt_num).all()
+        allowed_students = {s.id: s for s in students_query}
+        VALID_STATUSES = {'حاضر', 'غائب', 'مستأذن', 'مأجز'}
+        
+        submitted_data = {}
+        for key, value in request.form.items():
+            if key.startswith('student_'):
+                try:
+                    student_id = int(key.split('_')[1])
+                except ValueError:
+                    continue
+                
+                status_value = value.strip()
+                if status_value not in VALID_STATUSES or student_id not in allowed_students:
+                    continue
+                    
+                note_value = request.form.get(f'note_{student_id}', '').strip()[:255]
+                submitted_data[student_id] = {'status': status_value, 'note': note_value}
+        
+        if not submitted_data:
+            flash('لم يتم تحديد أي بيانات للتحضير.', 'error')
+            return redirect(url_for('admin_apartment_attendance', apt_num=apt_num, date=record_date_str))
+            
+        existing_records = Attendance.query.filter(
+            Attendance.student_id.in_(submitted_data.keys()),
+            Attendance.date == record_date
+        ).all()
+        record_dict = {r.student_id: r for r in existing_records}
+        
+        for s_id, data in submitted_data.items():
+            if s_id in record_dict:
+                record_dict[s_id].status = data['status']
+                record_dict[s_id].note = data['note']
+                record_dict[s_id].recorded_by = current_user.id
+            else:
+                new_record = Attendance(
+                    student_id=s_id, date=record_date, 
+                    status=data['status'], note=data['note'], 
+                    recorded_by=current_user.id
+                )
+                db.session.add(new_record)
+                
+            student = allowed_students[s_id]
+            if data['status'] == 'حاضر':
+                student.status = 'موجود'
+            else:
+                student.status = data['status']
+                    
+        db.session.commit()
+        flash(f'تم حفظ كشف تحضير الإدارة لتاريخ {record_date} بنجاح!', 'success')
+        return redirect(url_for('admin_apartment_attendance', apt_num=apt_num, date=record_date_str))
 
     # =========================================================================
     # 5. إدارة المناديب (تفعيل، تعطيل، وتعيين)
@@ -410,7 +509,7 @@ def register_routes(app):
             return redirect(url_for('mandoob_dashboard'))        
         
         all_mandoobs = User.query.filter_by(role='mandoob').join(Student).filter(
-            Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])
+            Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])
         ).order_by(Student.apartment_number, Student.room_number).all()
         
         # --- التعديل هنا: استخراج الأرقام بشكل صريح ومباشر ---
@@ -473,7 +572,7 @@ def register_routes(app):
             if student:
                 apt_students = Student.query.filter(
                     Student.apartment_number == student.apartment_number,
-                    Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])
+                    Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])
                 ).all()
                 for s in apt_students:
                     if s.user and s.id != student.id:
@@ -616,7 +715,7 @@ def register_routes(app):
         apt_num = mandoob_student.apartment_number
         students = Student.query.filter(
             Student.apartment_number == apt_num,
-            Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة'])
+            Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])
         ).order_by(Student.room_number).all()
         
        # حساب توقيت اليمن (UTC+3)
@@ -759,12 +858,10 @@ def register_routes(app):
                 
             # 2. 🌟 تحديث حالة الطالب الأساسية تلقائياً 🌟
             student = allowed_students[s_id]
-            if data['status'] == 'مأجز':
-                student.status = 'في إجازة'
-            elif data['status'] in ['حاضر', 'غائب', 'مستأذن']:
-                # إذا عاد الطالب من الإجازة وحضّره المندوب، يتم إعادته لحالة "موجود" تلقائياً
-                if student.status == 'في إجازة':
-                    student.status = 'موجود'
+            if data['status'] == 'حاضر':
+                student.status = 'موجود'
+            else:
+                student.status = data['status']
 
         db.session.commit()
         flash(f'تم حفظ كشف التحضير لتاريخ {record_date} وتحديث حالات الطلاب بنجاح!', 'success')
