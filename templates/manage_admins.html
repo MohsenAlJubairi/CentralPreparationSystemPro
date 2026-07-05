@@ -5,26 +5,7 @@
 
 {% block content %}
 
-<!-- بداية منطقة عرض الرسائل (Flash Messages) -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <div class="mb-6 space-y-2">
-            {% for category, message in messages %}
-                {% if category == 'error' %}
-                    <div class="bg-rose-50 border-r-4 border-rose-500 text-rose-700 px-4 py-3 rounded-lg flex items-center gap-3 shadow-sm animate-pulse-once">
-                        <i class="fa-solid fa-circle-exclamation text-xl"></i>
-                        <span class="font-bold text-sm">{{ message }}</span>
-                    </div>
-                {% else %}
-                    <div class="bg-emerald-50 border-r-4 border-emerald-500 text-emerald-700 px-4 py-3 rounded-lg flex items-center gap-3 shadow-sm">
-                        <i class="fa-solid fa-circle-check text-xl"></i>
-                        <span class="font-bold text-sm">{{ message }}</span>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endwith %}
+
 <!-- نهاية منطقة عرض الرسائل -->
 <div class="mb-6 glass-panel p-6 rounded-2xl border border-purple-200 dark:border-purple-900/50 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-l from-purple-50 to-transparent dark:from-purple-900/10">
     <div>

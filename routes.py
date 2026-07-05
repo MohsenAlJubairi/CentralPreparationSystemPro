@@ -360,6 +360,46 @@ def register_routes(app):
         flash('تم تحديث بيانات الطالب بنجاح!', 'success')
         return redirect(url_for('manage_students'))
 
+    @app.route('/student/<int:student_id>/profile')
+    @login_required
+    def student_profile(student_id):
+        # السماح للمدير، أو المندوب (المشرف على نفس الشقة إذا لزم، لكن مبدئياً الجميع لكي يرى المندوب طلابه)
+        student = Student.query.get_or_404(student_id)
+        
+        # جلب سجل التحضير مرتب من الأحدث للأقدم
+        records = Attendance.query.filter_by(student_id=student_id).order_by(Attendance.date.desc()).all()
+        
+        # إحصائيات
+        total_records = len(records)
+        present_count = sum(1 for r in records if r.status == 'حاضر')
+        absent_count = sum(1 for r in records if r.status == 'غائب')
+        excused_count = sum(1 for r in records if r.status == 'مستأذن')
+        leave_count = sum(1 for r in records if r.status == 'مأجز')
+        
+        # تجهيز بيانات آخر 30 يوماً للرسومات البيانية
+        recent_records = records[:30]
+        recent_records.reverse() # من الأقدم للأحدث للرسم البياني
+        
+        chart_dates = [r.date.strftime('%m-%d') for r in recent_records]
+        # رسم بياني: 1 للحضور، -1 للغياب، 0.5 للاستئذان... للتبسيط سنقوم بعرض التكرارات أو سنكتفي بتمرير النصوص لـ Chart.js
+        # سأمرر السجلات كاملة والـ JS سيقوم بالرسم
+        chart_data = {
+            'dates': chart_dates,
+            'statuses': [r.status for r in recent_records]
+        }
+        
+        return render_template('student_profile.html', 
+                               student=student, 
+                               records=records,
+                               stats={
+                                   'total': total_records,
+                                   'present': present_count,
+                                   'absent': absent_count,
+                                   'excused': excused_count,
+                                   'leave': leave_count
+                               },
+                               chart_data=chart_data)
+
     # =========================================================================
     # 4. إدارة الشقق
     # =========================================================================
@@ -1051,3 +1091,139 @@ def register_routes(app):
         
         flash('تم حذف الحساب نهائياً.', 'success')
         return redirect(url_for('manage_admins'))
+
+    # =========================================================================
+    # 9. إعدادات النظام والنسخ الاحتياطي
+    # =========================================================================
+    @app.route('/settings')
+    @login_required
+    def settings():
+        if current_user.role not in ['admin', 'developer']:
+            return redirect(url_for('mandoob_dashboard'))
+            
+        import os
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        backups_dir = os.path.join(base_dir, 'instance', 'backups')
+        
+        backups = []
+        if os.path.exists(backups_dir):
+            for filename in os.listdir(backups_dir):
+                if filename.endswith('.db') or filename.endswith('.sqlite3'):
+                    filepath = os.path.join(backups_dir, filename)
+                    size_mb = round(os.path.getsize(filepath) / (1024 * 1024), 2)
+                    timestamp = os.path.getmtime(filepath)
+                    date_str = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+                    backups.append({'name': filename, 'size': size_mb, 'date': date_str, 'timestamp': timestamp})
+                    
+        # Sort by newest
+        backups.sort(key=lambda x: x['timestamp'], reverse=True)
+        
+        return render_template('settings.html', backups=backups)
+
+    @app.route('/settings/backup', methods=['POST'])
+    @login_required
+    def create_backup():
+        if current_user.role not in ['admin', 'developer']:
+            return "غير مصرح", 403
+            
+        import os
+        import shutil
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        db_path = os.path.join(base_dir, 'instance', 'dormitory.db')
+        backups_dir = os.path.join(base_dir, 'instance', 'backups')
+        
+        if not os.path.exists(backups_dir):
+            os.makedirs(backups_dir)
+            
+        if os.path.exists(db_path):
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            backup_filename = f'backup_{timestamp}.db'
+            backup_path = os.path.join(backups_dir, backup_filename)
+            shutil.copy2(db_path, backup_path)
+            flash('تم إنشاء النسخة الاحتياطية بنجاح!', 'success')
+        else:
+            flash('لم يتم العثور على قاعدة البيانات الحالية!', 'error')
+            
+        return redirect(url_for('settings'))
+
+    @app.route('/settings/download_backup/<filename>')
+    @login_required
+    def download_backup(filename):
+        if current_user.role not in ['admin', 'developer']:
+            return "غير مصرح", 403
+            
+        import os
+        from flask import send_file
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        backup_path = os.path.join(base_dir, 'instance', 'backups', filename)
+        
+        if os.path.exists(backup_path):
+            return send_file(backup_path, as_attachment=True)
+        
+        flash('ملف النسخة الاحتياطية غير موجود.', 'error')
+        return redirect(url_for('settings'))
+
+    @app.route('/settings/delete_backup/<filename>', methods=['POST'])
+    @login_required
+    def delete_backup(filename):
+        if current_user.role not in ['admin', 'developer']:
+            return "غير مصرح", 403
+            
+        import os
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        backup_path = os.path.join(base_dir, 'instance', 'backups', filename)
+        
+        if os.path.exists(backup_path):
+            os.remove(backup_path)
+            flash('تم حذف النسخة الاحتياطية.', 'success')
+        else:
+            flash('ملف النسخة الاحتياطية غير موجود.', 'error')
+            
+        return redirect(url_for('settings'))
+
+    @app.route('/settings/restore/<filename>', methods=['POST'])
+    @login_required
+    def restore_backup(filename):
+        if current_user.role not in ['admin', 'developer']:
+            return "غير مصرح", 403
+            
+        import os
+        import shutil
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        db_path = os.path.join(base_dir, 'instance', 'dormitory.db')
+        backup_path = os.path.join(base_dir, 'instance', 'backups', filename)
+        
+        if os.path.exists(backup_path):
+            shutil.copy2(backup_path, db_path)
+            flash('تمت استعادة قاعدة البيانات بنجاح! إذا لم تلاحظ التغييرات فوراً، يرجى إعادة تحميل (Reload) التطبيق من الاستضافة.', 'success')
+        else:
+            flash('ملف النسخة الاحتياطية غير موجود.', 'error')
+            
+        return redirect(url_for('settings'))
+
+    @app.route('/settings/upload_restore', methods=['POST'])
+    @login_required
+    def upload_restore():
+        if current_user.role not in ['admin', 'developer']:
+            return "غير مصرح", 403
+            
+        import os
+        base_dir = os.path.abspath(os.path.dirname(__file__))
+        db_path = os.path.join(base_dir, 'instance', 'dormitory.db')
+        
+        if 'backup_file' not in request.files:
+            flash('لم يتم تحديد أي ملف.', 'error')
+            return redirect(url_for('settings'))
+            
+        file = request.files['backup_file']
+        if file.filename == '':
+            flash('لم يتم تحديد أي ملف.', 'error')
+            return redirect(url_for('settings'))
+            
+        if file and (file.filename.endswith('.db') or file.filename.endswith('.sqlite3')):
+            file.save(db_path)
+            flash('تم رفع الملف واستعادة قاعدة البيانات بنجاح! يرجى عمل Reload للتطبيق من الاستضافة إذا لزم الأمر.', 'success')
+        else:
+            flash('يجب أن يكون الملف بصيغة .db أو .sqlite3', 'error')
+            
+        return redirect(url_for('settings'))

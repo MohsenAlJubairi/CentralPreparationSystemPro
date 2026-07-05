@@ -21,16 +21,7 @@
         </a>
     </div>
 
-    <!-- رسائل النظام -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-            <div class="px-4 py-3 rounded-lg relative shadow-sm font-bold {% if category == 'error' %}bg-rose-100 text-rose-700 border border-rose-400{% else %}bg-emerald-100 text-emerald-700 border border-emerald-400{% endif %}">
-              <i class="fa-solid {% if category == 'error' %}fa-triangle-exclamation{% else %}fa-check-circle{% endif %} ml-1"></i> {{ message }}
-            </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+
 
     <!-- محدد التاريخ (Date Picker) -->
     <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 fade-in relative overflow-hidden">
@@ -54,8 +45,18 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for student in students %}
-                {% set current_status = att_dict.get(student.id, '') %}
-                
+                {% set db_status = att_dict.get(student.id) %}
+                {% if db_status %}
+                    {% set current_status = db_status %}
+                {% else %}
+                    {% if student.status in ['موجود', 'فعال', 'نشط'] %}
+                        {% set current_status = 'حاضر' %}
+                    {% elif student.status == 'في إجازة' %}
+                        {% set current_status = 'مأجز' %}
+                    {% else %}
+                        {% set current_status = student.status %}
+                    {% endif %}
+                {% endif %}
                 <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 hover:border-primary-300 dark:hover:border-primary-500 hover:shadow-soft transition-all duration-300">
                     
                     <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100 dark:border-slate-700">

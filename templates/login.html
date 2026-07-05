@@ -57,15 +57,7 @@
             <h2 class="text-2xl font-bold text-slate-800 dark:text-white mt-2">نظام التحضير - سكن بازرعة للطالب الجامعي - العاصمة عدن</h2>
         </div>
         
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <div class="bg-rose-100 border border-rose-200 text-rose-700 px-4 py-3 rounded-xl relative mb-6 text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-circle-exclamation text-lg"></i> {{ message }}
-              </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+
 
         <form action="/login" method="POST" class="space-y-5">
             <div>
@@ -118,6 +110,36 @@
                 eyeIcon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         }
+    </script>
+    
+    <!-- SweetAlert2 للإشعارات الاحترافية -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-start',
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% set icon = 'success' if category == 'success' else 'error' if category == 'error' else 'info' %}
+                        Toast.fire({
+                            icon: '{{ icon }}',
+                            title: '{{ message }}'
+                        });
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        });
     </script>
 </body>
 </html>

@@ -53,5 +53,35 @@
     </main>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>    {% block scripts %}{% endblock %}
+    
+    <!-- SweetAlert2 للإشعارات الاحترافية -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-start',
+                showConfirmButton: false,
+                timer: 3500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% set icon = 'success' if category == 'success' else 'error' if category == 'error' else 'info' %}
+                        Toast.fire({
+                            icon: '{{ icon }}',
+                            title: '{{ message }}'
+                        });
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        });
+    </script>
 </body>
 </html>
