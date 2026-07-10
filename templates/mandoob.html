@@ -161,7 +161,9 @@
         </div>
         
     {% else %}
-        <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in space-y-4">
+        <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in space-y-4 pb-32">
+            <!-- CSRF Token للحماية من الأخطاء -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             {% if allow_date_change %}
                 <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
@@ -175,7 +177,28 @@
                 <input type="hidden" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}">
             {% endif %}
 
+            <!-- إضافة ميزة الملاحظة العامة -->
+            <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-5 mb-6 shadow-sm relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-100/50 to-transparent dark:from-blue-800/30 w-0 group-focus-within:w-full transition-all duration-700 ease-out"></div>
+                <div class="relative z-10 flex flex-col md:flex-row gap-4 items-start md:items-center">
+                    <div class="w-12 h-12 shrink-0 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 flex items-center justify-center text-xl shadow-inner border-2 border-white dark:border-slate-800">
+                        <i class="fa-solid fa-bullhorn group-focus-within:-rotate-12 transition-transform"></i>
+                    </div>
+                    <div class="flex-1 w-full">
+                        <h3 class="font-bold text-lg text-blue-800 dark:text-blue-300 mb-1">تعميم ملاحظة (للجميع)</h3>
+                        <p class="text-xs text-blue-600/80 dark:text-blue-400 font-bold mb-3">اكتب هنا لتنسخ الملاحظة لجميع طلاب الشقة تلقائياً دفعة واحدة.</p>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
+                                <i class="fa-solid fa-pen-to-square text-blue-400"></i>
+                            </div>
+                            <input type="text" id="globalNoteInput" oninput="syncGlobalNote(this.value)" placeholder="اكتب ملاحظتك العامة هنا..." class="bg-white dark:bg-slate-800 border-2 border-blue-200 dark:border-blue-700 text-slate-800 dark:text-slate-200 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 block w-full pr-12 p-3 font-bold outline-none transition-all shadow-sm placeholder-slate-400">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 gap-4">
+
                 {% for student in students %}
                 
                     {% set db_status = att_dict.get(student.id) %}
@@ -299,7 +322,27 @@
         document.getElementById('doneSection').style.display = 'none';
         const form = document.getElementById('attendanceForm');
         form.style.display = 'block';
-        form.classList.add('fade-in');
+        setTimeout(() => {
+            form.classList.add('show');
+        }, 50);
+    }
+
+    // مزامنة الملاحظة العامة مع جميع الطلاب
+    function syncGlobalNote(value) {
+        // البحث عن جميع حقول الملاحظات للطلاب
+        const noteInputs = document.querySelectorAll('input[name^="note_"]');
+        noteInputs.forEach(input => {
+            input.value = value;
+            
+            // إظهار حقل الملاحظة للطالب إذا لم يكن ظاهراً وكان هناك نص مكتوب
+            const containerId = input.name.replace('note_', 'note_container_');
+            const container = document.getElementById(containerId);
+            if (container) {
+                if (value.trim() !== '') {
+                    container.style.display = 'block';
+                }
+            }
+        });
     }
 
     // إظهار/إخفاء حقل الملاحظة بشكل ناعم

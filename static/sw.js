@@ -1,5 +1,5 @@
 // تم تغيير رقم الإصدار لإجبار المتصفح على تحديث الكاش
-const CACHE_NAME = 'bazara-cache-v3';
+const CACHE_NAME = 'bazara-cache-v4';
 
 const urlsToCache = [
     '/static/manifest.json',
@@ -69,7 +69,31 @@ self.addEventListener('push', function(event) {
         icon: '/static/Images/logo.png',
         badge: '/static/Images/logo.png',
         dir: 'rtl',
-        vibrate: [200, 100, 200]
+        vibrate: [300, 100, 400, 100, 400], // اهتزاز أقوى وأطول للفت الانتباه
+        requireInteraction: true, // يجعله منبثقاً في الأعلى (Heads-up) ولا يختفي حتى يلمسه
+        silent: false, // لضمان تشغيل صوت الإشعار الافتراضي للهاتف
+        tag: 'mandoob-alert', // لعدم تكرار الإشعارات وتحديث الإشعار القديم
+        data: { url: '/' }
     };
     event.waitUntil(self.registration.showNotification(data.title, options));
+});
+
+// عند الضغط على الإشعار، يفتح التطبيق مباشرة
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+    event.waitUntil(
+        clients.matchAll({ type: 'window' }).then(windowClients => {
+            // إذا كان التطبيق مفتوحاً في الخلفية، اجلبه للمقدمة
+            for (let i = 0; i < windowClients.length; i++) {
+                const client = windowClients[i];
+                if (client.url === '/' && 'focus' in client) {
+                    return client.focus();
+                }
+            }
+            // إذا لم يكن مفتوحاً، افتح نافذة جديدة
+            if (clients.openWindow) {
+                return clients.openWindow('/');
+            }
+        })
+    );
 });

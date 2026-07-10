@@ -43,7 +43,7 @@ def is_safe_url(target):
 
 # =========================================================================
 
-def register_routes(app):
+def register_routes(app, limiter=None, csrf=None):
 
     # ملاحظة: لتفعيل CSRF، قم بتثبيت flask_wtf وإلغاء تعليق الأسطر التالية، 
     # ثم أضف {{ csrf_token() }} في جميع نماذج HTML.
@@ -90,6 +90,10 @@ def register_routes(app):
             else:
                 flash('اسم المستخدم أو كلمة المرور غير صحيحة', 'error')
         return render_template('login.html')
+
+    # ✅ تطبيق Rate Limiting على صفحة تسجيل الدخول - الدفاع ضد Brute Force
+    if limiter:
+        limiter.limit("10 per minute; 30 per hour")(login)
 
     @app.route('/logout')
     @login_required
@@ -585,12 +589,16 @@ def register_routes(app):
                         "body": body
                     }),
                     vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
-                    # التعديل هنا: إضافة "mailto:"
-                    vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL'].replace('mailto:', '')}
+                    vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL'].replace('mailto:', '')},
+                    ttl=86400 # 24 hours
                 )
                 success_count += 1
             except WebPushException as ex:
                 print(f"فشل إرسال الإشعار: {repr(ex)}")
+                # حذف الاشتراك من قاعدة البيانات إذا انتهت صلاحيته
+                if ex.response is not None and ex.response.status_code in [404, 410]:
+                    db.session.delete(sub)
+                    db.session.commit()
                 
         if success_count > 0:
             flash('تم إرسال الإشعار للمندوب بنجاح!', 'success')
@@ -936,6 +944,9 @@ def register_routes(app):
             
         return jsonify({'status': 'تم تفعيل الإشعارات بنجاح!'})
 
+    if csrf:
+        csrf.exempt(subscribe)
+
     @app.route('/unsubscribe', methods=['POST'])
     @login_required
     def unsubscribe():
@@ -947,6 +958,9 @@ def register_routes(app):
         db.session.commit()
         
         return jsonify({'status': 'تم إلغاء تفعيل الإشعارات.'})
+
+    if csrf:
+        csrf.exempt(unsubscribe)
     # -------------------------------------------------------------------------
     # مسار المهام المجدولة (يُستدعى يومياً عبر cron-job.org)
     # -------------------------------------------------------------------------
@@ -991,7 +1005,9 @@ def register_routes(app):
                             "body": f"يا {mandoob.username}، لم تقم برفع تحضير شقتك حتى الآن. يرجى الدخول للنظام فوراً."
                         }),
                         vapid_private_key=app.config['VAPID_PRIVATE_KEY'],
-                        vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL'].replace('mailto:', '')})
+                        vapid_claims={"sub": "mailto:" + app.config['VAPID_CLAIM_EMAIL'].replace('mailto:', '')},
+                        ttl=86400
+                    )
                     notifications_sent += 1
                     
                 except WebPushException as ex:
@@ -1155,7 +1171,19 @@ def register_routes(app):
         import os
         from flask import send_file
         base_dir = os.path.abspath(os.path.dirname(__file__))
-        backup_path = os.path.join(base_dir, 'instance', 'backups', filename)
+        backups_dir = os.path.join(base_dir, 'instance', 'backups')
+
+        # إصلاح Path Traversal: لا نثق بالاسم المدخل مباشرة
+        safe_filename = os.path.basename(filename)
+        if not safe_filename.endswith(('.db', '.sqlite3')) or '..' in filename or '/' in filename:
+            flash('اسم الملف غير صالح.', 'error')
+            return redirect(url_for('settings'))
+
+        backup_path = os.path.join(backups_dir, safe_filename)
+        # تحقق نهائي: التأكد من أن المسار لايزال داخل مجلد النسخ فقط
+        if not os.path.abspath(backup_path).startswith(os.path.abspath(backups_dir)):
+            flash('محاولة وصول غير مصرح بها.', 'error')
+            return redirect(url_for('settings'))
         
         if os.path.exists(backup_path):
             return send_file(backup_path, as_attachment=True)
@@ -1171,7 +1199,18 @@ def register_routes(app):
             
         import os
         base_dir = os.path.abspath(os.path.dirname(__file__))
-        backup_path = os.path.join(base_dir, 'instance', 'backups', filename)
+        backups_dir = os.path.join(base_dir, 'instance', 'backups')
+
+        # إصلاح Path Traversal
+        safe_filename = os.path.basename(filename)
+        if not safe_filename.endswith(('.db', '.sqlite3')) or '..' in filename or '/' in filename:
+            flash('اسم الملف غير صالح.', 'error')
+            return redirect(url_for('settings'))
+
+        backup_path = os.path.join(backups_dir, safe_filename)
+        if not os.path.abspath(backup_path).startswith(os.path.abspath(backups_dir)):
+            flash('محاولة وصول غير مصرح بها.', 'error')
+            return redirect(url_for('settings'))
         
         if os.path.exists(backup_path):
             os.remove(backup_path)
@@ -1191,7 +1230,18 @@ def register_routes(app):
         import shutil
         base_dir = os.path.abspath(os.path.dirname(__file__))
         db_path = os.path.join(base_dir, 'instance', 'dormitory.db')
-        backup_path = os.path.join(base_dir, 'instance', 'backups', filename)
+        backups_dir = os.path.join(base_dir, 'instance', 'backups')
+
+        # إصلاح Path Traversal
+        safe_filename = os.path.basename(filename)
+        if not safe_filename.endswith(('.db', '.sqlite3')) or '..' in filename or '/' in filename:
+            flash('اسم الملف غير صالح.', 'error')
+            return redirect(url_for('settings'))
+
+        backup_path = os.path.join(backups_dir, safe_filename)
+        if not os.path.abspath(backup_path).startswith(os.path.abspath(backups_dir)):
+            flash('محاولة وصول غير مصرح بها.', 'error')
+            return redirect(url_for('settings'))
         
         if os.path.exists(backup_path):
             shutil.copy2(backup_path, db_path)

@@ -40,7 +40,8 @@
     </div>
 
     <!-- بطاقات الطلاب للتحضير -->
-    <form id="adminAttendanceForm" action="{{ url_for('admin_submit_attendance', apt_num=apt_num) }}" method="POST" class="fade-in space-y-4">
+    <form id="adminAttendanceForm" action="{{ url_for('admin_submit_attendance', apt_num=apt_num) }}" method="POST" class="fade-in space-y-4 pb-32">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="record_date" value="{{ target_date.strftime('%Y-%m-%d') }}">
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
