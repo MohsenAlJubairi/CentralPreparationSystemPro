@@ -773,7 +773,8 @@ def register_routes(app, limiter=None, csrf=None):
         is_allowed_time = (current_hour >= 18) or (current_hour < 6)
         
         # 🌟 استخدام التاريخ المنطقي بشكل صحيح 🌟
-        logical_today = (now_in_yemen - timedelta(hours=3)).date()
+        # نطرح 6 ساعات من وقت اليمن لكي يبدأ يوم التحضير الجديد (التاريخ) بعد انتهاء فترة التحضير في 6 صباحاً
+        logical_today = (now_in_yemen - timedelta(hours=6)).date()
         
 
         # 2. بناء بيانات "تقويم الحماسة" (آخر 7 أيام)
@@ -842,11 +843,11 @@ def register_routes(app, limiter=None, csrf=None):
         
         # إذا لم يكن الوقت مسموحاً، ولم يقم الإداري بفتح صلاحية تغيير التاريخ
         if not is_allowed_time and not allow_date:
-            flash('عذراً، وقت التحضير متاح فقط من الساعة 6:00 مساءً وحتى 3:00 فجراً.', 'error')
+            flash('عذراً، وقت التحضير متاح فقط من الساعة 6:00 مساءً وحتى 6:00 صباحاً.', 'error')
             return redirect(url_for('mandoob_dashboard'))
             
         # 🌟 حساب التاريخ المنطقي للحفظ 🌟
-        logical_today = (now_in_yemen - timedelta(hours=3)).date()
+        logical_today = (now_in_yemen - timedelta(hours=6)).date()
 
         record_date_str = request.form.get('record_date')
         # هنا أيضاً نستخدم logical_today بدلاً من date.today()

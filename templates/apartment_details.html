@@ -63,7 +63,7 @@
                         </td>
                         <td class="px-6 py-4 rounded-l-2xl border-y border-l border-slate-100 dark:border-slate-700 text-center">
                             
-                            {% if student.status != 'فعال' and student.status != 'نشط' %}
+                            {% if student.status not in ['فعال', 'نشط', 'موجود'] %}
                                 <button class="bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 px-4 py-2 rounded-xl text-xs font-bold cursor-not-allowed" title="لا يمكن تعيين طالب حالته: {{ student.status }}" disabled>
                                     غير مؤهل <i class="fa-solid fa-ban ml-1"></i>
                                 </button>
