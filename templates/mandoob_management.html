@@ -2,115 +2,116 @@
 
 {% block title %}إدارة المناديب{% endblock %}
 
-{% block header_title %}إدارة حسابات المناديب <span class="text-sm font-normal text-slate-500">(التحكم بالصلاحيات)</span>{% endblock %}
+{% block header_title %}إدارة المناديب <span class="hidden sm:inline text-sm font-normal text-slate-500 mr-2">(التحكم بالصلاحيات)</span>{% endblock %}
 
 {% block content %}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-6">
+        <div class="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between bg-white dark:bg-slate-800">
             <div>
                 <p class="text-slate-500 text-xs font-bold mb-1">إجمالي الحسابات</p>
-                <h3 class="text-2xl font-bold">{{ mandoobs|length }}</h3>
+                <h3 class="text-xl sm:text-2xl font-bold">{{ mandoobs|length }}</h3>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-xl"><i class="fa-solid fa-id-card"></i></div>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fa-solid fa-id-card"></i></div>
         </div>
-        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div class="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between bg-white dark:bg-slate-800">
             <div>
                 <p class="text-slate-500 text-xs font-bold mb-1">مناديب نشطون</p>
-                <h3 class="text-2xl font-bold text-emerald-600">
+                <h3 class="text-xl sm:text-2xl font-bold text-emerald-600">
                     {{ mandoobs|selectattr('is_active', 'equalto', True)|list|length }}
                 </h3>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl"><i class="fa-solid fa-user-check"></i></div>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fa-solid fa-user-check"></i></div>
         </div>
-        <div class="glass-panel p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div class="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between bg-white dark:bg-slate-800">
             <div>
                 <p class="text-slate-500 text-xs font-bold mb-1">حسابات معطلة</p>
-                <h3 class="text-2xl font-bold text-rose-600">
+                <h3 class="text-xl sm:text-2xl font-bold text-rose-600">
                     {{ mandoobs|selectattr('is_active', 'equalto', False)|list|length }}
                 </h3>
             </div>
-            <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl"><i class="fa-solid fa-user-slash"></i></div>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg sm:text-xl shrink-0"><i class="fa-solid fa-user-slash"></i></div>
         </div>
     </div>
 
-    <div class="glass-panel rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h3 class="font-bold text-lg text-slate-800">قائمة المناديب</h3>
+    <div class="glass-panel rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden bg-white dark:bg-slate-800">
+        <div class="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4">
+            <h3 class="font-bold text-base sm:text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-user-tie text-primary"></i> قائمة المناديب
+            </h3>
             
-            <div class="flex gap-3 w-full md:w-auto">
-                <select id="statusFilter" class="bg-white border border-slate-200 rounded-xl py-2 px-4 text-sm outline-none focus:border-primary font-bold text-slate-600 shadow-sm">
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                <select id="statusFilter" class="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl py-2 px-3.5 text-xs sm:text-sm outline-none focus:border-primary font-bold text-slate-600 dark:text-slate-200 shadow-sm">
                     <option value="active" selected>النشطون فقط</option>
                     <option value="inactive">المعطلون فقط</option>
                     <option value="all">عرض الكل</option>
                 </select>
                 
-                <div class="relative flex-1 md:w-64">
-                    <input type="text" id="mandoobSearch" placeholder="بحث باسم المندوب..." class="w-full bg-white border border-slate-200 rounded-xl py-2 pr-10 pl-4 text-sm outline-none focus:border-primary shadow-sm">
+                <div class="relative flex-1 sm:w-64">
+                    <input type="text" id="mandoobSearch" placeholder="بحث باسم المندوب..." class="w-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl py-2 pr-10 pl-4 text-xs sm:text-sm outline-none focus:border-primary shadow-sm text-slate-800 dark:text-slate-100">
                     <i class="fa-solid fa-search absolute right-3 top-2.5 text-slate-400"></i>
                 </div>
             </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-right border-separate border-spacing-y-2 px-6">
+        <div class="overflow-x-auto w-full p-2 sm:p-4">
+            <table class="w-full text-right border-separate border-spacing-y-2 text-sm">
                 <thead>
-                    <tr class="text-slate-400 text-sm">
-                        <th class="p-4 font-medium">المندوب</th>
-                        <th class="p-4 font-medium">اسم المستخدم</th>
-                        <th class="p-4 font-medium">الشقة الحالية</th>
-                        <th class="p-4 font-medium">الحالة</th>
-                        <th class="p-4 font-medium text-center">الإشعارات</th>
-                        <th class="p-4 font-medium text-center">الإجراءات</th>
+                    <tr class="text-slate-400 dark:text-slate-500 text-xs sm:text-sm">
+                        <th class="p-3 sm:p-4 font-medium whitespace-nowrap min-w-[150px]">المندوب</th>
+                        <th class="p-3 sm:p-4 font-medium whitespace-nowrap">اسم المستخدم</th>
+                        <th class="p-3 sm:p-4 font-medium whitespace-nowrap">الشقة الحالية</th>
+                        <th class="p-3 sm:p-4 font-medium whitespace-nowrap text-center">الحالة</th>
+                        <th class="p-3 sm:p-4 font-medium text-center whitespace-nowrap">الإشعارات</th>
+                        <th class="p-3 sm:p-4 font-medium text-center whitespace-nowrap">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="mandoobTableBody">
                     {% for mandoob in mandoobs %}
-                    <tr class="bg-white dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 rounded-2xl hover:bg-slate-50 transition mandoob-row" 
+                    <tr class="bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-2xl hover:bg-slate-100/70 dark:hover:bg-slate-700/60 transition mandoob-row" 
                         data-name="{{ mandoob.name }}" 
                         data-active="{{ 'true' if mandoob.is_active else 'false' }}">
                         
-                        <td class="p-4 font-bold rounded-r-2xl">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 uppercase">{{ mandoob.name[0] }}</div>
-                                <span>{{ mandoob.name }}</span>
+                        <td class="p-3 sm:p-4 font-bold rounded-r-2xl whitespace-nowrap">
+                            <div class="flex items-center gap-2.5 sm:gap-3">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 uppercase text-xs sm:text-sm shrink-0">{{ mandoob.name[0] }}</div>
+                                <span class="text-slate-800 dark:text-slate-100">{{ mandoob.name }}</span>
                             </div>
                         </td>
-                        <td class="p-4 text-slate-500 font-mono text-sm" dir="ltr">{{ mandoob.username }}</td>
-                        <td class="p-4">
+                        <td class="p-3 sm:p-4 text-slate-500 dark:text-slate-400 font-mono text-xs sm:text-sm whitespace-nowrap" dir="ltr">{{ mandoob.username }}</td>
+                        <td class="p-3 sm:p-4 whitespace-nowrap">
                             {% if mandoob.student %}
-                                <span class="bg-primary-50 text-primary-600 px-3 py-1 rounded-lg text-xs font-bold">شقة {{ mandoob.student.apartment_number }}</span>
+                                <span class="bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 px-2.5 py-1 rounded-lg text-xs font-bold border border-primary-100 dark:border-primary-800">شقة {{ mandoob.student.apartment_number }}</span>
                             {% else %}
                                 <span class="text-slate-400 text-xs italic">غير مرتبط بشقة</span>
                             {% endif %}
                         </td>
-                        <td class="p-4">
+                        <td class="p-3 sm:p-4 text-center whitespace-nowrap">
                             {% if mandoob.is_active %}
                                 <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200">نشط</span>
                             {% else %}
                                 <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs font-bold border border-rose-200">معطل</span>
                             {% endif %}
                         </td>
-                        <td class="p-4 text-center">
+                        <td class="p-3 sm:p-4 text-center whitespace-nowrap">
                             {% if mandoob.id in subscribed_ids %}
-                                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-3 py-1.5 rounded-xl text-xs font-bold border border-amber-200 shadow-sm" title="يستقبل الإشعارات">
+                                <div class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-xl text-xs font-bold border border-amber-200 shadow-sm" title="يستقبل الإشعارات">
                                     <i class="fa-solid fa-bell text-amber-500"></i>
                                     <span>مفعل</span>
                                 </div>
                             {% else %}
-                                <div class="inline-flex items-center gap-1.5 text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl text-xs font-bold border border-slate-100" title="لم يقم بتفعيل الإشعارات">
+                                <div class="inline-flex items-center gap-1.5 text-slate-400 bg-slate-100 dark:bg-slate-700 px-2.5 py-1 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-600" title="لم يقم بتفعيل الإشعارات">
                                     <i class="fa-solid fa-bell-slash"></i>
                                     <span>غير مفعل</span>
                                 </div>
                             {% endif %}
-
                         </td>
-                        <td class="p-4 rounded-l-2xl text-center">
-                            <div class="flex justify-center gap-2">
+                        <td class="p-3 sm:p-4 rounded-l-2xl text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1.5 sm:gap-2">
                                 {% if mandoob.id in subscribed_ids %}
                                 <button type="button" 
                                         onclick="openNotifyModal('{{ mandoob.id }}', '{{ mandoob.name }}')"
                                         title="إرسال إشعار للمندوب"
-                                        class="px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white">
+                                        class="p-2 rounded-xl text-xs font-bold transition shadow-sm bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white">
                                     <i class="fa-solid fa-paper-plane"></i>
                                 </button>
                                 {% endif %}
@@ -120,16 +121,15 @@
                                         data-name="{{ mandoob.name }}"
                                         onclick="openPasswordModal(this)" 
                                         title="تغيير كلمة المرور"
-                                        class="px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white">
+                                        class="p-2 rounded-xl text-xs font-bold transition shadow-sm bg-primary-50 text-primary-600 hover:bg-primary-600 hover:text-white">
                                     <i class="fa-solid fa-key"></i>
                                 </button>
                                 
                                 <a href="{{ url_for('toggle_mandoob', user_id=mandoob.id) }}" 
-                                   class="px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm
+                                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm inline-flex items-center gap-1
                                    {% if mandoob.is_active %}bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white{% else %}bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white{% endif %}">
-                                     {% if mandoob.is_active %}<i class="fa-solid fa-power-off ml-1"></i> تعطيل{% else %}<i class="fa-solid fa-check ml-1"></i> تفعيل{% endif %}
+                                     {% if mandoob.is_active %}<i class="fa-solid fa-power-off"></i> <span>تعطيل</span>{% else %}<i class="fa-solid fa-check"></i> <span>تفعيل</span>{% endif %}
                                 </a>
-                                
                             </div>
                         </td>                        
                     </tr>
@@ -139,44 +139,51 @@
         </div>
     </div>
 
-    <div id="resetPasswordModal" class="hidden absolute inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
-            <div class="p-5 border-b border-slate-200 flex justify-between">
-                <h3 class="font-bold text-lg text-primary">تغيير كلمة المرور</h3>
-                <button onclick="closePasswordModal()" class="text-rose-500"><i class="fa-solid fa-xmark"></i></button>
+    <!-- نافذة تعيين كلمة المرور (موقع ثابت ومضبوط للجوال) -->
+    <div id="resetPasswordModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="font-bold text-base sm:text-lg text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-key"></i> تغيير كلمة المرور
+                </h3>
+                <button onclick="closePasswordModal()" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 p-2 rounded-lg transition"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form id="resetPasswordForm" method="POST" class="p-6 space-y-5">
+            <form id="resetPasswordForm" method="POST" class="p-5 sm:p-6 space-y-4 sm:space-y-5">
                 <div>
-                    <p class="text-sm text-slate-500 mb-4">تعيين كلمة مرور جديدة للمندوب: <strong id="modalUserName" class="text-slate-800"></strong></p>
-                    <label class="block text-sm font-bold mb-2 text-slate-700">كلمة المرور الجديدة</label>
-                    <input type="text" name="new_password" required minlength="6" placeholder="أدخل 6 أحرف على الأقل..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary transition font-mono">
+                    <p class="text-xs sm:text-sm text-slate-500 mb-3">تعيين كلمة مرور جديدة للمندوب: <strong id="modalUserName" class="text-slate-800 dark:text-slate-100"></strong></p>
+                    <label class="block text-xs sm:text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300">كلمة المرور الجديدة</label>
+                    <input type="text" name="new_password" required minlength="6" placeholder="أدخل 6 أحرف على الأقل..." class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-3 outline-none focus:border-primary transition font-mono text-sm text-slate-800 dark:text-slate-100">
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button type="submit" class="flex-1 bg-primary hover:bg-primary-600 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-primary-200/50">حفظ وتشفير</button>
-                    <button type="button" onclick="closePasswordModal()" class="flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 py-3 rounded-xl font-bold transition">إلغاء</button>
+                    <button type="submit" class="flex-1 bg-primary hover:bg-primary-600 text-white py-3 rounded-xl font-bold transition shadow-lg text-sm">حفظ وتشفير</button>
+                    <button type="button" onclick="closePasswordModal()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 py-3 rounded-xl font-bold transition text-sm">إلغاء</button>
                 </div>
             </form>
         </div>
     </div>
-    <div id="notifyModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden relative">
-            <div class="p-5 border-b border-slate-200 flex justify-between">
-                <h3 class="font-bold text-lg text-purple-600"><i class="fa-solid fa-bell"></i> إرسال إشعار مباشر</h3>
-                <button onclick="closeNotifyModal()" class="text-rose-500 hover:text-rose-700 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+    <!-- نافذة إرسال الإشعار المباشر -->
+    <div id="notifyModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
+            <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 class="font-bold text-base sm:text-lg text-purple-600 flex items-center gap-2">
+                    <i class="fa-solid fa-bell"></i> إرسال إشعار مباشر
+                </h3>
+                <button onclick="closeNotifyModal()" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 p-2 rounded-lg transition"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form action="{{ url_for('send_custom_notification') }}" method="POST" class="p-6 space-y-4">
+            <form action="{{ url_for('send_custom_notification') }}" method="POST" class="p-5 sm:p-6 space-y-4">
                 <input type="hidden" name="user_id" id="notifyUserId">
                 <div>
-                    <p class="text-sm text-slate-500 mb-3 font-bold">إلى المندوب: <strong id="notifyUserName" class="text-slate-800"></strong></p>
+                    <p class="text-xs sm:text-sm text-slate-500 mb-3 font-bold">إلى المندوب: <strong id="notifyUserName" class="text-slate-800 dark:text-slate-100"></strong></p>
                     
-                    <label class="block text-xs font-bold mb-1 text-slate-600">عنوان الإشعار</label>
-                    <input type="text" name="title" value="تنبيه من الإدارة 🚨" required class="w-full mb-3 bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:border-purple-500 font-bold text-sm">
+                    <label class="block text-xs font-bold mb-1 text-slate-600 dark:text-slate-300">عنوان الإشعار</label>
+                    <input type="text" name="title" value="تنبيه من الإدارة 🚨" required class="w-full mb-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-purple-500 font-bold text-sm text-slate-800 dark:text-slate-100">
                     
-                    <label class="block text-xs font-bold mb-1 text-slate-600">نص الرسالة</label>
-                    <textarea name="body" required placeholder="اكتب رسالتك هنا..." rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none focus:border-purple-500 font-bold text-sm resize-none"></textarea>
+                    <label class="block text-xs font-bold mb-1 text-slate-600 dark:text-slate-300">نص الرسالة</label>
+                    <textarea name="body" required placeholder="اكتب رسالتك هنا..." rows="3" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-purple-500 font-bold text-sm resize-none text-slate-800 dark:text-slate-100"></textarea>
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-purple-200/50 flex items-center justify-center gap-2">
+                    <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-paper-plane"></i> إرسال
                     </button>
                 </div>
@@ -210,9 +217,7 @@
     document.getElementById('statusFilter').addEventListener('change', filterTable);
     document.addEventListener('DOMContentLoaded', filterTable);
 
-    // دوال النافذة المنبثقة
     function openPasswordModal(element) {
-        // جلب البيانات من الزر نفسه بطريقة آمنة لا تزعج المحرر
         let userId = element.getAttribute('data-id');
         let userName = element.getAttribute('data-name');
         
@@ -221,6 +226,12 @@
         document.getElementById('resetPasswordModal').classList.remove('hidden');
         document.getElementById('resetPasswordModal').classList.add('flex');
     }
+    
+    function closePasswordModal() {
+        document.getElementById('resetPasswordModal').classList.add('hidden');
+        document.getElementById('resetPasswordModal').classList.remove('flex');
+    }
+
     function openNotifyModal(userId, userName) {
         document.getElementById('notifyUserId').value = userId;
         document.getElementById('notifyUserName').innerText = userName;

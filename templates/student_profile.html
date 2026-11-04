@@ -2,27 +2,27 @@
 
 {% block title %}الملف الشخصي للطالب - {{ student.full_name }}{% endblock %}
 
-{% block header_title %}الملف الشخصي <span class="text-sm font-normal text-slate-500">({{ student.full_name }})</span>{% endblock %}
+{% block header_title %}الملف الشخصي <span class="hidden sm:inline text-sm font-normal text-slate-500 mr-2">({{ student.full_name }})</span>{% endblock %}
 
 {% block extra_css %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-6">
+<div class="max-w-6xl mx-auto space-y-5 sm:space-y-6">
 
     <!-- Header Section -->
-    <div class="glass-panel rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden bg-white dark:bg-slate-800">
-        <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
-        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl"></div>
+    <div class="glass-panel rounded-2xl sm:rounded-3xl p-5 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 relative overflow-hidden bg-white dark:bg-slate-800">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
-        <div class="flex items-center gap-6 relative z-10">
-            <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-4xl text-slate-400 shadow-inner">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-4 sm:gap-6 relative z-10 w-full sm:w-auto">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-3xl sm:text-4xl text-slate-400 shadow-inner shrink-0">
                 <i class="fa-solid fa-user-graduate"></i>
             </div>
             <div>
-                <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">{{ student.full_name }}</h2>
-                <div class="flex flex-wrap items-center gap-4 text-sm font-bold text-slate-500 dark:text-slate-400">
+                <h2 class="text-xl sm:text-3xl font-extrabold text-slate-800 dark:text-white mb-2">{{ student.full_name }}</h2>
+                <div class="flex flex-wrap justify-center sm:justify-start items-center gap-2 sm:gap-4 text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-400">
                     <span class="flex items-center gap-1"><i class="fa-solid fa-building text-amber-500"></i> شقة {{ student.apartment_number }}</span>
                     <span class="flex items-center gap-1"><i class="fa-solid fa-door-open text-emerald-500"></i> غرفة {{ student.room_number }}</span>
                     <span class="flex items-center gap-1">
@@ -33,120 +33,122 @@
             </div>
         </div>
         
-        <div class="relative z-10 flex gap-3">
-            <a href="javascript:history.back()" class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl font-bold transition flex items-center gap-2 shadow-sm">
+        <div class="relative z-10 flex gap-3 w-full sm:w-auto justify-center sm:justify-end">
+            <a href="javascript:history.back()" class="w-full sm:w-auto bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm text-sm">
                 <i class="fa-solid fa-arrow-right"></i> العودة
             </a>
         </div>
     </div>
 
     <!-- Stats Section -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         <!-- الحضور -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-1 hover:shadow-md">
+        <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-0.5">
             <div>
-                <p class="text-sm font-bold text-slate-500 mb-1">أيام الحضور</p>
-                <h3 class="text-3xl font-black text-emerald-600">{{ stats.present }}</h3>
+                <p class="text-xs sm:text-sm font-bold text-slate-500 mb-1">أيام الحضور</p>
+                <h3 class="text-2xl sm:text-3xl font-black text-emerald-600">{{ stats.present }}</h3>
             </div>
-            <div class="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-500 text-xl">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-500 text-lg sm:text-xl shrink-0">
                 <i class="fa-solid fa-check"></i>
             </div>
         </div>
         
         <!-- الغياب -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-rose-100 dark:border-rose-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-1 hover:shadow-md">
+        <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl border border-rose-100 dark:border-rose-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-0.5">
             <div>
-                <p class="text-sm font-bold text-slate-500 mb-1">أيام الغياب</p>
-                <h3 class="text-3xl font-black text-rose-600">{{ stats.absent }}</h3>
+                <p class="text-xs sm:text-sm font-bold text-slate-500 mb-1">أيام الغياب</p>
+                <h3 class="text-2xl sm:text-3xl font-black text-rose-600">{{ stats.absent }}</h3>
             </div>
-            <div class="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-900/50 flex items-center justify-center text-rose-500 text-xl">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-50 dark:bg-rose-900/50 flex items-center justify-center text-rose-500 text-lg sm:text-xl shrink-0">
                 <i class="fa-solid fa-xmark"></i>
             </div>
         </div>
 
         <!-- استئذان -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-amber-100 dark:border-amber-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-1 hover:shadow-md">
+        <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl border border-amber-100 dark:border-amber-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-0.5">
             <div>
-                <p class="text-sm font-bold text-slate-500 mb-1">أيام الاستئذان</p>
-                <h3 class="text-3xl font-black text-amber-600">{{ stats.excused }}</h3>
+                <p class="text-xs sm:text-sm font-bold text-slate-500 mb-1">أيام الاستئذان</p>
+                <h3 class="text-2xl sm:text-3xl font-black text-amber-600">{{ stats.excused }}</h3>
             </div>
-            <div class="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-900/50 flex items-center justify-center text-amber-500 text-xl">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-50 dark:bg-amber-900/50 flex items-center justify-center text-amber-500 text-lg sm:text-xl shrink-0">
                 <i class="fa-solid fa-hand-paper"></i>
             </div>
         </div>
 
         <!-- إجازة -->
-        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-purple-100 dark:border-purple-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-1 hover:shadow-md">
+        <div class="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl border border-purple-100 dark:border-purple-900/30 shadow-sm flex items-center justify-between transition hover:-translate-y-0.5">
             <div>
-                <p class="text-sm font-bold text-slate-500 mb-1">أيام الإجازة</p>
-                <h3 class="text-3xl font-black text-purple-600">{{ stats.leave }}</h3>
+                <p class="text-xs sm:text-sm font-bold text-slate-500 mb-1">أيام الإجازة</p>
+                <h3 class="text-2xl sm:text-3xl font-black text-purple-600">{{ stats.leave }}</h3>
             </div>
-            <div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/50 flex items-center justify-center text-purple-500 text-xl">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-purple-50 dark:bg-purple-900/50 flex items-center justify-center text-purple-500 text-lg sm:text-xl shrink-0">
                 <i class="fa-solid fa-plane"></i>
             </div>
         </div>
     </div>
 
     <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <!-- الدائرة (النسبة الإجمالية) -->
-        <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-6"><i class="fa-solid fa-chart-pie text-primary mr-2"></i> التوزيع الإجمالي</h3>
-            <div class="relative h-64 flex justify-center items-center">
+        <div class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h3 class="font-bold text-base sm:text-lg text-slate-800 dark:text-white mb-4 sm:mb-6"><i class="fa-solid fa-chart-pie text-primary mr-2"></i> التوزيع الإجمالي</h3>
+            <div class="relative h-60 sm:h-64 flex justify-center items-center">
                 {% if stats.total > 0 %}
                     <canvas id="doughnutChart"></canvas>
                 {% else %}
-                    <p class="text-slate-400 font-bold text-center">لا توجد بيانات كافية لعرض الرسم البياني.</p>
+                    <p class="text-slate-400 font-bold text-center text-sm">لا توجد بيانات كافية لعرض الرسم البياني.</p>
                 {% endif %}
             </div>
         </div>
 
         <!-- الرسم الشريطي (آخر 30 يوم) -->
-        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-6"><i class="fa-solid fa-chart-line text-primary mr-2"></i> سجل الحضور لآخر 30 يوم</h3>
-            <div class="relative h-64 w-full">
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+            <h3 class="font-bold text-base sm:text-lg text-slate-800 dark:text-white mb-4 sm:mb-6"><i class="fa-solid fa-chart-line text-primary mr-2"></i> سجل الحضور لآخر 30 يوم</h3>
+            <div class="relative h-60 sm:h-64 w-full">
                 {% if chart_data.dates %}
                     <canvas id="barChart"></canvas>
                 {% else %}
-                    <p class="text-slate-400 font-bold text-center h-full flex items-center justify-center">لا توجد بيانات كافية لعرض الرسم البياني.</p>
+                    <p class="text-slate-400 font-bold text-center h-full flex items-center justify-center text-sm">لا توجد بيانات كافية لعرض الرسم البياني.</p>
                 {% endif %}
             </div>
         </div>
     </div>
 
     <!-- History Table -->
-    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden mb-8">
-        <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-white"><i class="fa-solid fa-clock-rotate-left text-primary mr-2"></i> السجل التفصيلي</h3>
-            <span class="bg-primary/10 text-primary-700 font-bold px-3 py-1 rounded-full text-sm">{{ stats.total }} سجل</span>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden mb-6">
+        <div class="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+            <h3 class="font-bold text-base sm:text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-primary"></i> السجل التفصيلي
+            </h3>
+            <span class="bg-primary/10 text-primary-700 dark:text-primary-400 font-bold px-2.5 py-1 rounded-full text-xs sm:text-sm">{{ stats.total }} سجل</span>
         </div>
-        <div class="overflow-x-auto max-h-96 overflow-y-auto custom-scrollbar">
+        <div class="overflow-x-auto max-h-96 overflow-y-auto custom-scrollbar w-full">
             <table class="w-full text-right text-sm">
-                <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 sticky top-0 z-10 shadow-sm">
+                <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 sticky top-0 z-10 shadow-sm text-xs sm:text-sm">
                     <tr>
-                        <th class="p-4 font-bold">التاريخ</th>
-                        <th class="p-4 font-bold text-center">الحالة</th>
-                        <th class="p-4 font-bold">الملاحظة</th>
+                        <th class="p-3 sm:p-4 font-bold whitespace-nowrap">التاريخ</th>
+                        <th class="p-3 sm:p-4 font-bold text-center whitespace-nowrap">الحالة</th>
+                        <th class="p-3 sm:p-4 font-bold whitespace-nowrap">الملاحظة</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200 dark:divide-slate-700">
                     {% for record in records %}
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                        <td class="p-4 font-bold text-slate-700 dark:text-slate-300" dir="ltr">{{ record.date.strftime('%Y-%m-%d') }}</td>
-                        <td class="p-4 text-center">
+                        <td class="p-3 sm:p-4 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap" dir="ltr">{{ record.date.strftime('%Y-%m-%d') }}</td>
+                        <td class="p-3 sm:p-4 text-center whitespace-nowrap">
                             {% if record.status == 'حاضر' %}
-                                <span class="text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full text-xs font-bold w-20 inline-block text-center">حاضر</span>
+                                <span class="text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full text-xs font-bold w-18 sm:w-20 inline-block text-center">حاضر</span>
                             {% elif record.status == 'غائب' %}
-                                <span class="text-rose-700 bg-rose-100 px-3 py-1 rounded-full text-xs font-bold w-20 inline-block text-center">غائب</span>
+                                <span class="text-rose-700 bg-rose-100 px-3 py-1 rounded-full text-xs font-bold w-18 sm:w-20 inline-block text-center">غائب</span>
                             {% elif record.status == 'مستأذن' %}
-                                <span class="text-amber-700 bg-amber-100 px-3 py-1 rounded-full text-xs font-bold w-20 inline-block text-center">مستأذن</span>
+                                <span class="text-amber-700 bg-amber-100 px-3 py-1 rounded-full text-xs font-bold w-18 sm:w-20 inline-block text-center">مستأذن</span>
                             {% elif record.status == 'مأجز' %}
-                                <span class="text-purple-700 bg-purple-100 px-3 py-1 rounded-full text-xs font-bold w-20 inline-block text-center">مأجز</span>
+                                <span class="text-purple-700 bg-purple-100 px-3 py-1 rounded-full text-xs font-bold w-18 sm:w-20 inline-block text-center">مأجز</span>
                             {% else %}
-                                <span class="text-slate-600 bg-slate-200 px-3 py-1 rounded-full text-xs font-bold w-20 inline-block text-center">{{ record.status }}</span>
+                                <span class="text-slate-600 bg-slate-200 px-3 py-1 rounded-full text-xs font-bold w-18 sm:w-20 inline-block text-center">{{ record.status }}</span>
                             {% endif %}
                         </td>
-                        <td class="p-4 text-slate-500 max-w-xs truncate" title="{{ record.note }}">{{ record.note if record.note else '-' }}</td>
+                        <td class="p-3 sm:p-4 text-slate-500 max-w-xs truncate" title="{{ record.note }}">{{ record.note if record.note else '-' }}</td>
                     </tr>
                     {% else %}
                     <tr>
@@ -163,34 +165,24 @@
 
 {% block scripts %}
 <script>
-    // تمرير البيانات من Jinja إلى جافاسكريبت
     const stats = {{ stats | tojson }};
     const chartData = {{ chart_data | tojson | safe }};
     
-    // إعداد ألوان بناءً على السمة (Dark/Light)
     const isDark = document.documentElement.classList.contains('dark');
     const textColor = isDark ? '#cbd5e1' : '#475569';
     const gridColor = isDark ? '#334155' : '#e2e8f0';
 
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // 1. الدائرة (Doughnut Chart)
         if(stats.total > 0) {
             const ctxDoughnut = document.getElementById('doughnutChart').getContext('2d');
             new Chart(ctxDoughnut, {
                 type: 'doughnut',
                 data: {
-                    labels: ['حاضر', 'غائب', 'مستأذن', 'مأجز'],
+                    labels: ['حاضر', 'غائب', 'مستأذن', 'إجازة'],
                     datasets: [{
                         data: [stats.present, stats.absent, stats.excused, stats.leave],
-                        backgroundColor: [
-                            '#10b981', // emerald-500
-                            '#f43f5e', // rose-500
-                            '#f59e0b', // amber-500
-                            '#a855f7'  // purple-500
-                        ],
-                        borderWidth: 0,
-                        hoverOffset: 4
+                        backgroundColor: ['#10b981', '#f43f5e', '#f59e0b', '#a855f7'],
+                        borderWidth: 0
                     }]
                 },
                 options: {
@@ -199,76 +191,37 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: {
-                                font: { family: "'Tajawal', sans-serif", weight: 'bold' },
-                                color: textColor,
-                                padding: 20
-                            }
+                            labels: { color: textColor, font: { family: 'Tajawal', weight: 'bold' } }
                         }
-                    },
-                    cutout: '70%'
+                    }
                 }
             });
         }
 
-        // 2. الرسم الشريطي (Bar Chart للـ 30 يوماً الماضية)
-        if(chartData && chartData.dates && chartData.dates.length > 0) {
+        if(chartData.dates && chartData.dates.length > 0) {
             const ctxBar = document.getElementById('barChart').getContext('2d');
-            
-            // تحويل الحالات إلى أرقام لتسهيل الرسم (أو نستخدم ألوان مختلفة للأعمدة)
-            // سنجعل قيمة العمود دائمًا 1 لكي نرى الأيام كبلوكات بنفس الطول، لكن نلونه بناءً على الحالة
-            const barData = chartData.statuses.map(() => 1);
-            const barColors = chartData.statuses.map(status => {
-                if(status === 'حاضر') return '#10b981';
-                if(status === 'غائب') return '#f43f5e';
-                if(status === 'مستأذن') return '#f59e0b';
-                if(status === 'مأجز') return '#a855f7';
-                return '#94a3b8';
-            });
-
             new Chart(ctxBar, {
                 type: 'bar',
                 data: {
                     labels: chartData.dates,
-                    datasets: [{
-                        label: 'الحالة',
-                        data: barData,
-                        backgroundColor: barColors,
-                        borderRadius: 4,
-                        barPercentage: 0.6
-                    }]
+                    datasets: [
+                        { label: 'حاضر', data: chartData.present, backgroundColor: '#10b981', borderRadius: 4 },
+                        { label: 'غائب', data: chartData.absent, backgroundColor: '#f43f5e', borderRadius: 4 },
+                        { label: 'مستأذن', data: chartData.excused, backgroundColor: '#f59e0b', borderRadius: 4 },
+                        { label: 'إجازة', data: chartData.leave, backgroundColor: '#a855f7', borderRadius: 4 }
+                    ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    // بدلاً من عرض الرقم 1، نعرض الحالة النصية
-                                    const index = context.dataIndex;
-                                    return ' الحالة: ' + chartData.statuses[index];
-                                }
-                            },
-                            titleFont: { family: "'Tajawal', sans-serif" },
-                            bodyFont: { family: "'Tajawal', sans-serif" },
-                            rtl: true
-                        }
-                    },
                     scales: {
-                        y: {
-                            display: false,
-                            beginAtZero: true
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                font: { family: "'Tajawal', sans-serif", size: 10 },
-                                color: textColor,
-                                maxRotation: 45,
-                                minRotation: 0
-                            }
+                        x: { stacked: true, grid: { color: gridColor }, ticks: { color: textColor, font: { family: 'Tajawal' } } },
+                        y: { stacked: true, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 } }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: textColor, font: { family: 'Tajawal', weight: 'bold' } }
                         }
                     }
                 }

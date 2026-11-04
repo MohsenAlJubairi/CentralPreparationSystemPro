@@ -2,48 +2,50 @@
 
 {% block title %}إدارة شقة {{ apt_num }}{% endblock %}
 
+{% block header_title %}تفاصيل شقة {{ apt_num }}{% endblock %}
+
 {% block content %}
-    <div class="mb-6">
-        <a href="/apartments" class="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-sm font-bold">
+    <div class="mb-5">
+        <a href="/apartments" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-sm font-bold text-sm">
             <i class="fa-solid fa-arrow-right"></i> العودة لقائمة الشقق
         </a>
     </div>
 
-
-
-    <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full">
+    <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-full bg-white dark:bg-slate-800">
         
-        <div class="p-5 border-b border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex flex-wrap gap-4 justify-between items-center">
-            <div class="flex items-center gap-4">
-                <h3 class="font-bold text-xl text-primary"><i class="fa-solid fa-users ml-2"></i>طلاب شقة {{ apt_num }}</h3>
-                <a href="{{ url_for('admin_apartment_attendance', apt_num=apt_num) }}" class="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary-200 dark:hover:bg-primary-900/50 transition flex items-center gap-2 shadow-sm">
+        <div class="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-stretch sm:items-center">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-4">
+                <h3 class="font-bold text-lg sm:text-xl text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-users"></i> طلاب شقة {{ apt_num }}
+                </h3>
+                <a href="{{ url_for('admin_apartment_attendance', apt_num=apt_num) }}" class="bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-primary-200 dark:border-primary-800 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold hover:bg-primary-200 dark:hover:bg-primary-900/50 transition flex items-center justify-center gap-2 shadow-sm">
                     <i class="fa-solid fa-clipboard-user"></i> تحضير الشقة (إدارة)
                 </a>
             </div>
             
-            <div class="relative w-full md:w-72">
+            <div class="relative w-full sm:w-72">
                 <input type="text" id="searchStudent" placeholder="بحث باسم الطالب..." class="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl py-2 pr-10 pl-4 outline-none focus:border-primary transition text-sm">
-                <i class="fa-solid fa-search absolute right-3 top-3 text-slate-400"></i>
+                <i class="fa-solid fa-search absolute right-3 top-2.5 text-slate-400"></i>
             </div>
         </div>
 
-        <div class="overflow-auto flex-1 p-6">
+        <div class="overflow-x-auto flex-1 p-3 sm:p-6 w-full">
             {% if students %}
-            <table class="w-full text-right border-separate border-spacing-y-3">
+            <table class="w-full text-right border-separate border-spacing-y-2.5 text-sm">
                 <thead>
-                    <tr class="text-slate-400 dark:text-slate-500 text-sm">
-                        <th class="px-4 py-2 font-medium">اسم الطالب</th>
-                        <th class="px-4 py-2 font-medium">الغرفة</th>
-                        <th class="px-4 py-2 font-medium">الحالة</th>
-                        <th class="px-4 py-2 font-medium text-center">الصلاحيات</th>
+                    <tr class="text-slate-400 dark:text-slate-500 text-xs sm:text-sm">
+                        <th class="px-3 sm:px-4 py-2 font-medium whitespace-nowrap min-w-[160px]">اسم الطالب</th>
+                        <th class="px-3 sm:px-4 py-2 font-medium text-center whitespace-nowrap">الغرفة</th>
+                        <th class="px-3 sm:px-4 py-2 font-medium text-center whitespace-nowrap">الحالة</th>
+                        <th class="px-3 sm:px-4 py-2 font-medium text-center whitespace-nowrap">الصلاحيات</th>
                     </tr>
                 </thead>
                 <tbody id="studentsTableBody">
                     {% for student in students %}
                     <tr class="student-row bg-slate-50 dark:bg-slate-800/80 hover:bg-primary-50 dark:hover:bg-slate-700 transition rounded-2xl" data-name="{{ student.full_name }}">
-                        <td class="px-6 py-4 rounded-r-2xl border-y border-r border-slate-100 dark:border-slate-700">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full {% if mandoob and mandoob.id == student.id %}bg-amber-500{% else %}bg-primary{% endif %} text-white flex items-center justify-center font-bold shadow-sm">
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 rounded-r-2xl border-y border-r border-slate-100 dark:border-slate-700 whitespace-nowrap">
+                            <div class="flex items-center gap-2.5 sm:gap-3">
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full {% if mandoob and mandoob.id == student.id %}bg-amber-500{% else %}bg-primary{% endif %} text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-sm shrink-0">
                                     {{ student.full_name[0] }}
                                 </div>
                                 <span class="font-bold text-slate-700 dark:text-slate-200">
@@ -51,29 +53,29 @@
                                 </span>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-slate-600 dark:text-slate-400 font-bold border-y border-slate-100 dark:border-slate-700">{{ student.room_number }}</td>
-                        <td class="px-6 py-4 border-y border-slate-100 dark:border-slate-700">
-                            {% if student.status == 'فعال' or student.status == 'نشط' %}
-                                <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200">نشط</span>
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 text-slate-600 dark:text-slate-400 font-bold border-y border-slate-100 dark:border-slate-700 text-center whitespace-nowrap">{{ student.room_number }}</td>
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 border-y border-slate-100 dark:border-slate-700 text-center whitespace-nowrap">
+                            {% if student.status == 'فعال' or student.status == 'نشط' or student.status == 'موجود' %}
+                                <span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-200">موجود</span>
                             {% elif student.status == 'في إجازة' %}
-                                <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-bold border border-purple-200">في إجازة</span>
+                                <span class="bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full text-xs font-bold border border-purple-200">في إجازة</span>
                             {% else %}
-                                <span class="bg-rose-100 text-rose-700 px-3 py-1 rounded-full text-xs font-bold border border-rose-200">{{ student.status }}</span>
+                                <span class="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full text-xs font-bold border border-rose-200">{{ student.status }}</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 rounded-l-2xl border-y border-l border-slate-100 dark:border-slate-700 text-center">
+                        <td class="px-3 sm:px-6 py-3 sm:py-4 rounded-l-2xl border-y border-l border-slate-100 dark:border-slate-700 text-center whitespace-nowrap">
                             
                             {% if student.status not in ['فعال', 'نشط', 'موجود'] %}
-                                <button class="bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 px-4 py-2 rounded-xl text-xs font-bold cursor-not-allowed" title="لا يمكن تعيين طالب حالته: {{ student.status }}" disabled>
+                                <button class="bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold cursor-not-allowed" title="لا يمكن تعيين طالب حالته: {{ student.status }}" disabled>
                                     غير مؤهل <i class="fa-solid fa-ban ml-1"></i>
                                 </button>
                             {% elif mandoob and mandoob.id == student.id %}
-                                <button class="revoke-btn bg-rose-100 text-rose-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-500 hover:text-white transition shadow-sm"
+                                <button class="revoke-btn bg-rose-100 text-rose-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold hover:bg-rose-500 hover:text-white transition shadow-sm"
                                         data-id="{{ student.id }}" data-name="{{ student.full_name }}">
                                     <i class="fa-solid fa-ban ml-1"></i> سحب الصلاحية
                                 </button>
                             {% else %}
-                                <button class="assign-btn bg-primary text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-primary-600 transition shadow-sm {% if mandoob %}opacity-50 cursor-not-allowed{% endif %}"
+                                <button class="assign-btn bg-primary text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold hover:bg-primary-600 transition shadow-sm {% if mandoob %}opacity-50 cursor-not-allowed{% endif %}"
                                         data-id="{{ student.id }}" data-name="{{ student.full_name }}" {% if mandoob %}title="اسحب صلاحية المندوب الحالي أولاً" disabled{% endif %}>
                                     تعيين كمندوب <i class="fa-solid fa-user-plus mr-1"></i>
                                 </button>
@@ -85,45 +87,45 @@
                 </tbody>
             </table>
             {% else %}
-                <div class="text-center py-20 text-slate-400">
-                    <i class="fa-solid fa-door-closed text-6xl mb-4 opacity-40"></i>
-                    <p class="font-bold text-xl">لا يوجد طلاب مسجلين في هذه الشقة.</p>
+                <div class="text-center py-16 text-slate-400">
+                    <i class="fa-solid fa-door-closed text-5xl mb-3 opacity-40"></i>
+                    <p class="font-bold text-lg">لا يوجد طلاب مسجلين في هذه الشقة.</p>
                 </div>
             {% endif %}
         </div>
     </div>
 
     <div id="assignModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md justify-center items-center p-4">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden border-t-4 border-primary">
-            <div class="p-5 border-b border-slate-100 dark:border-slate-700 bg-primary-50/50 text-center">
-                <h3 class="font-bold text-xl text-slate-800">تعيين مندوب جديد</h3>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden border-t-4 border-primary max-h-[90vh] overflow-y-auto">
+            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-700 bg-primary-50/50 dark:bg-primary-950/20 text-center">
+                <h3 class="font-bold text-lg sm:text-xl text-slate-800 dark:text-white">تعيين مندوب جديد</h3>
             </div>
-            <form id="assignForm" method="POST" class="p-6 space-y-5">
-                <p class="text-sm text-slate-500 text-center">سيتم تعيين <strong id="mandoobName" class="text-primary text-lg"></strong> كمندوب لشقة {{ apt_num }}.</p>
+            <form id="assignForm" method="POST" class="p-5 sm:p-6 space-y-4">
+                <p class="text-xs sm:text-sm text-slate-500 text-center">سيتم تعيين <strong id="mandoobName" class="text-primary text-base sm:text-lg"></strong> كمندوب لشقة {{ apt_num }}.</p>
                 <div>
-                    <label class="block text-sm font-bold mb-2">اسم المستخدم (للدخول)</label>
-                    <input type="text" name="username" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary text-left" dir="ltr">
+                    <label class="block text-xs sm:text-sm font-bold mb-1.5">اسم المستخدم (للدخول)</label>
+                    <input type="text" name="username" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 sm:p-3 outline-none focus:border-primary text-left text-sm" dir="ltr">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold mb-2">كلمة المرور</label>
-                    <input type="password" name="password" required class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-primary text-left" dir="ltr">
+                    <label class="block text-xs sm:text-sm font-bold mb-1.5">كلمة المرور</label>
+                    <input type="password" name="password" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 sm:p-3 outline-none focus:border-primary text-left text-sm" dir="ltr">
                 </div>
                 <div class="pt-2 flex gap-3">
-                    <button type="submit" class="flex-1 bg-primary text-white py-3 rounded-xl font-bold transition">حفظ وتعيين</button>
-                    <button type="button" class="close-assign flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 py-3 rounded-xl font-bold transition">إلغاء</button>
+                    <button type="submit" class="flex-1 bg-primary text-white py-2.5 sm:py-3 rounded-xl font-bold transition text-sm">حفظ وتعيين</button>
+                    <button type="button" class="close-assign flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 py-2.5 sm:py-3 rounded-xl font-bold transition text-sm">إلغاء</button>
                 </div>
             </form>
         </div>
     </div>
 
     <div id="revokeModal" class="hidden fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-md justify-center items-center p-4">
-        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden border-t-4 border-rose-500 text-center p-6">
-            <div class="w-20 h-20 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-4xl mx-auto mb-4 animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h3 class="font-bold text-2xl text-slate-800 mb-2">تأكيد سحب الصلاحية</h3>
-            <p class="text-slate-500 mb-6">هل أنت متأكد من سحب صلاحية المندوب من الطالب <strong id="revokeName" class="text-rose-600"></strong>؟</p>
+        <div class="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden border-t-4 border-rose-500 text-center p-5 sm:p-6 max-h-[90vh] overflow-y-auto">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center text-3xl sm:text-4xl mx-auto mb-3 animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 class="font-bold text-xl sm:text-2xl text-slate-800 dark:text-white mb-2">تأكيد سحب الصلاحية</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mb-5">هل أنت متأكد من سحب صلاحية المندوب من الطالب <strong id="revokeName" class="text-rose-600"></strong>؟</p>
             <form id="revokeForm" method="POST" class="flex gap-3">
-                <button type="submit" class="flex-1 bg-rose-500 text-white py-3 rounded-xl font-bold transition shadow-lg">سحب الصلاحية</button>
-                <button type="button" class="close-revoke flex-1 bg-slate-100 text-slate-700 hover:bg-slate-200 py-3 rounded-xl font-bold transition">إلغاء</button>
+                <button type="submit" class="flex-1 bg-rose-500 text-white py-2.5 sm:py-3 rounded-xl font-bold transition shadow-lg text-sm">سحب الصلاحية</button>
+                <button type="button" class="close-revoke flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 py-2.5 sm:py-3 rounded-xl font-bold transition text-sm">إلغاء</button>
             </form>
         </div>
     </div>
@@ -132,8 +134,6 @@
 {% block scripts %}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        
-        // البحث داخل الصفحة
         const searchInput = document.getElementById('searchStudent');
         if(searchInput) {
             searchInput.addEventListener('keyup', function() {
@@ -145,7 +145,6 @@
             });
         }
 
-        // التعيين
         const assignModal = document.getElementById('assignModal');
         document.querySelectorAll('.assign-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -159,7 +158,6 @@
             assignModal.classList.add('hidden'); assignModal.classList.remove('flex');
         });
 
-        // السحب
         const revokeModal = document.getElementById('revokeModal');
         document.querySelectorAll('.revoke-btn').forEach(btn => {
             btn.addEventListener('click', function() {

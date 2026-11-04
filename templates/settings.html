@@ -2,53 +2,53 @@
 
 {% block title %}إعدادات النظام{% endblock %}
 
+{% block header_title %}إعدادات النظام <span class="hidden sm:inline text-sm font-normal text-slate-500 mr-2">(النسخ الاحتياطي)</span>{% endblock %}
+
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-6">
+<div class="max-w-6xl mx-auto space-y-5 sm:space-y-6">
     <!-- رأس الصفحة -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
         <div>
-            <h1 class="text-3xl font-bold text-slate-800 dark:text-white flex items-center gap-3">
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2 sm:gap-3">
                 <i class="fa-solid fa-cog text-primary animate-[spin_4s_linear_infinite]"></i>
-                إعدادات النظام
+                إعدادات ونسخ النظام
             </h1>
-            <p class="text-slate-500 dark:text-slate-400 font-medium mt-2">
+            <p class="text-slate-500 dark:text-slate-400 font-medium mt-1 text-xs sm:text-sm">
                 إدارة النسخ الاحتياطية واستعادة قاعدة البيانات.
             </p>
         </div>
     </div>
 
-
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         
         <!-- القسم الجانبي (الأدوات السريعة) -->
-        <div class="lg:col-span-1 space-y-6">
+        <div class="lg:col-span-1 space-y-4 sm:space-y-6">
             <!-- كارت أخذ نسخة احتياطية -->
-            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+            <div class="bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
                 
-                <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-2 flex items-center gap-2">
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-1.5 flex items-center gap-2">
                     <i class="fa-solid fa-shield-halved text-emerald-500"></i> حماية البيانات
                 </h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-5">
                     قم بأخذ نسخة احتياطية لقاعدة البيانات بضغطة زر واحدة لتأمين سجلات الطلاب والمناديب.
                 </p>
                 
                 <form action="{{ url_for('create_backup') }}" method="POST">
-                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3.5 rounded-xl font-bold transition shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 text-lg transform hover:-translate-y-0.5">
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-xl font-bold transition shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 text-base transform hover:-translate-y-0.5 active:scale-95">
                         <i class="fa-solid fa-database"></i> إنشاء نسخة احتياطية
                     </button>
                 </form>
             </div>
 
             <!-- كارت رفع نسخة احتياطية (Upload) -->
-            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+            <div class="bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
                 
-                <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-2 flex items-center gap-2">
+                <h2 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white mb-1.5 flex items-center gap-2">
                     <i class="fa-solid fa-upload text-amber-500"></i> رفع واستعادة
                 </h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-5">
                     استعادة النظام من ملف (db.) موجود على جهازك.
                 </p>
                 
@@ -56,11 +56,11 @@
                     <div class="mb-4">
                         <label for="fileUpload" class="block w-full border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-4 text-center cursor-pointer hover:border-amber-500 dark:hover:border-amber-500 transition hover:bg-slate-50 dark:hover:bg-slate-700/50 group">
                             <input type="file" name="backup_file" accept=".db,.sqlite3" required class="hidden" id="fileUpload">
-                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 group-hover:text-amber-500 transition mb-2"></i>
-                            <p class="text-sm font-bold text-slate-600 dark:text-slate-300" id="fileName">اختر ملف قاعدة البيانات</p>
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl sm:text-3xl text-slate-400 group-hover:text-amber-500 transition mb-2"></i>
+                            <p class="text-xs sm:text-sm font-bold text-slate-600 dark:text-slate-300" id="fileName">اختر ملف قاعدة البيانات</p>
                         </label>
                     </div>
-                    <button type="submit" class="w-full bg-slate-800 dark:bg-slate-600 hover:bg-slate-900 text-white px-6 py-3 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2">
+                    <button type="submit" class="w-full bg-slate-800 dark:bg-slate-600 hover:bg-slate-900 text-white px-5 py-3 rounded-xl font-bold transition shadow-md flex items-center justify-center gap-2 text-sm">
                         <i class="fa-solid fa-clock-rotate-left"></i> بدء الاستعادة
                     </button>
                 </form>
@@ -69,52 +69,57 @@
 
         <!-- القسم الرئيسي (سجل النسخ الاحتياطية) -->
         <div class="lg:col-span-2">
-            <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 h-full flex flex-col">
-                <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-server text-primary"></i> أرشيف النسخ الاحتياطية (السيرفر)
-                </h2>
+            <div class="bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-slate-700 h-full flex flex-col">
+                <div class="flex justify-between items-center mb-4 sm:mb-6">
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-server text-primary"></i> أرشيف النسخ الاحتياطية
+                    </h2>
+                    <span class="text-[11px] sm:text-xs text-slate-400 font-bold block sm:hidden">
+                        <i class="fa-solid fa-arrows-left-right ml-1"></i> اسحب
+                    </span>
+                </div>
                 
-                <div class="overflow-auto flex-1">
+                <div class="overflow-x-auto flex-1 w-full">
                     {% if backups %}
-                    <table class="w-full text-right border-separate border-spacing-y-3">
+                    <table class="w-full text-right border-separate border-spacing-y-2.5 text-sm">
                         <thead>
-                            <tr class="text-slate-400 dark:text-slate-500 text-sm">
-                                <th class="px-4 py-2 font-medium">اسم النسخة</th>
-                                <th class="px-4 py-2 font-medium">الحجم</th>
-                                <th class="px-4 py-2 font-medium">التاريخ والوقت</th>
-                                <th class="px-4 py-2 font-medium text-center">الإجراءات</th>
+                            <tr class="text-slate-400 dark:text-slate-500 text-xs sm:text-sm">
+                                <th class="px-3 sm:px-4 py-2 font-medium whitespace-nowrap min-w-[150px]">اسم النسخة</th>
+                                <th class="px-3 sm:px-4 py-2 font-medium whitespace-nowrap">الحجم</th>
+                                <th class="px-3 sm:px-4 py-2 font-medium whitespace-nowrap">التاريخ والوقت</th>
+                                <th class="px-3 sm:px-4 py-2 font-medium text-center whitespace-nowrap">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for backup in backups %}
                             <tr class="bg-slate-50 dark:bg-slate-800/80 hover:bg-primary-50 dark:hover:bg-slate-700 transition rounded-2xl group">
-                                <td class="px-4 py-4 rounded-r-2xl border-y border-r border-slate-100 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200" dir="ltr">
+                                <td class="px-3 sm:px-4 py-3 rounded-r-2xl border-y border-r border-slate-100 dark:border-slate-700 font-bold text-slate-700 dark:text-slate-200 whitespace-nowrap" dir="ltr">
                                     <div class="flex items-center gap-2">
-                                        <i class="fa-solid fa-file-lines text-slate-400"></i>
-                                        {{ backup.name }}
+                                        <i class="fa-solid fa-file-lines text-slate-400 text-xs"></i>
+                                        <span class="truncate max-w-[160px] sm:max-w-xs" title="{{ backup.name }}">{{ backup.name }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-4 border-y border-slate-100 dark:border-slate-700 text-sm font-bold text-slate-500">
+                                <td class="px-3 sm:px-4 py-3 border-y border-slate-100 dark:border-slate-700 text-xs sm:text-sm font-bold text-slate-500 whitespace-nowrap">
                                     {{ backup.size }} MB
                                 </td>
-                                <td class="px-4 py-4 border-y border-slate-100 dark:border-slate-700 text-sm text-slate-500">
+                                <td class="px-3 sm:px-4 py-3 border-y border-slate-100 dark:border-slate-700 text-xs text-slate-500 whitespace-nowrap">
                                     <span class="bg-slate-200 dark:bg-slate-600 px-2 py-1 rounded-md">{{ backup.date }}</span>
                                 </td>
-                                <td class="px-4 py-4 rounded-l-2xl border-y border-l border-slate-100 dark:border-slate-700">
-                                    <div class="flex justify-center items-center gap-2">
+                                <td class="px-3 sm:px-4 py-3 rounded-l-2xl border-y border-l border-slate-100 dark:border-slate-700 whitespace-nowrap">
+                                    <div class="flex justify-center items-center gap-1.5 sm:gap-2">
                                         <!-- تنزيل -->
-                                        <a href="{{ url_for('download_backup', filename=backup.name) }}" title="تنزيل" class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors">
+                                        <a href="{{ url_for('download_backup', filename=backup.name) }}" title="تنزيل" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition-colors text-xs sm:text-sm">
                                             <i class="fa-solid fa-download"></i>
                                         </a>
                                         <!-- استعادة -->
                                         <form action="{{ url_for('restore_backup', filename=backup.name) }}" method="POST" class="inline" onsubmit="return confirm('هل أنت متأكد من رغبتك في استعادة النظام باستخدام هذه النسخة؟ سيتم مسح أي بيانات جديدة أضيفت بعد هذا التاريخ!');">
-                                            <button type="submit" title="استعادة" class="w-9 h-9 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors">
+                                            <button type="submit" title="استعادة" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 flex items-center justify-center transition-colors text-xs sm:text-sm">
                                                 <i class="fa-solid fa-clock-rotate-left"></i>
                                             </button>
                                         </form>
                                         <!-- حذف -->
                                         <form action="{{ url_for('delete_backup', filename=backup.name) }}" method="POST" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه النسخة الاحتياطية نهائياً؟');">
-                                            <button type="submit" title="حذف" class="w-9 h-9 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition-colors">
+                                            <button type="submit" title="حذف" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition-colors text-xs sm:text-sm">
                                                 <i class="fa-regular fa-trash-can"></i>
                                             </button>
                                         </form>
@@ -126,9 +131,9 @@
                     </table>
                     {% else %}
                     <div class="flex flex-col items-center justify-center h-full text-center py-10 opacity-60">
-                        <i class="fa-solid fa-database text-6xl text-slate-300 dark:text-slate-600 mb-4"></i>
-                        <h3 class="text-lg font-bold text-slate-600 dark:text-slate-400">لا توجد نسخ احتياطية</h3>
-                        <p class="text-sm text-slate-500">قم بإنشاء نسختك الاحتياطية الأولى الآن لضمان أمان بياناتك.</p>
+                        <i class="fa-solid fa-database text-5xl sm:text-6xl text-slate-300 dark:text-slate-600 mb-3"></i>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-600 dark:text-slate-400">لا توجد نسخ احتياطية</h3>
+                        <p class="text-xs sm:text-sm text-slate-500">قم بإنشاء نسختك الاحتياطية الأولى الآن لضمان أمان بياناتك.</p>
                     </div>
                     {% endif %}
                 </div>
@@ -139,7 +144,6 @@
 </div>
 
 <script>
-    // تغيير نص الرفع عند اختيار ملف
     document.getElementById('fileUpload').addEventListener('change', function(e) {
         const fileName = e.target.files[0]?.name;
         if (fileName) {

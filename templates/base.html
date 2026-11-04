@@ -9,7 +9,7 @@
     
     <link rel="icon" href="{{ url_for('static', filename='Images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0"> <!--change the v -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.0"> <!--change the v -->
     <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">    
 
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -24,9 +24,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Service Worker Failed', err));
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
     </script>
@@ -41,20 +39,24 @@
         }
     </script>
 </head>
-<body class="bg-slate-100 dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex">
+<body class="bg-slate-100 dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex relative overflow-x-hidden">
+
+    <!-- خلفية تعتيم عند فتح القائمة على الجوال -->
+    <div id="sidebar-overlay" onclick="toggleMobileSidebar(false)" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     {% include 'components/sidebar.html' %}
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative min-w-0">
         
         {% include 'components/header.html' %}
 
-        <div class="p-8 overflow-y-auto flex-1 animate-fade-in">
+        <div class="p-4 sm:p-6 md:p-8 overflow-y-auto flex-1 animate-fade-in">
             {% block content %}{% endblock %}
         </div>
     </main>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>    {% block scripts %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=3.0"></script>
+    {% block scripts %}{% endblock %}
     
     <!-- SweetAlert2 للإشعارات الاحترافية -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

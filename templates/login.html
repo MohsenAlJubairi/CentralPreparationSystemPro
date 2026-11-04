@@ -2,12 +2,12 @@
 <html lang="ar" dir="rtl" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>تسجيل الدخول - نظام بازرعه للطالب الجامعي</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.0">
     <!-- PWA Settings -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#f97316">
@@ -19,81 +19,114 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Service Worker Failed', err));
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
     </script>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=3.0"></script>
     <script>
-        // Apply dark mode immediately
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
         }
     </script>
+    <style>
+        /* تأثير تساقط أوراق الخريف الاحترافي */
+        .autumn-leaf {
+            position: absolute;
+            top: -10vh;
+            pointer-events: none;
+            will-change: transform, opacity;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+            animation: fallAndSway linear infinite;
+        }
+
+        @keyframes fallAndSway {
+            0% {
+                opacity: 0;
+                transform: translate3d(0, -6vh, 0) rotateZ(0deg) rotateY(0deg) rotateX(0deg);
+            }
+            12% {
+                opacity: var(--leaf-opacity, 0.75);
+            }
+            50% {
+                transform: translate3d(var(--sway-x, 40px), 52vh, 0) rotateZ(180deg) rotateY(180deg) rotateX(70deg);
+            }
+            88% {
+                opacity: var(--leaf-opacity, 0.75);
+            }
+            100% {
+                opacity: 0;
+                transform: translate3d(calc(var(--sway-x, 40px) * -0.6), 108vh, 0) rotateZ(360deg) rotateY(360deg) rotateX(140deg);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #leaves-container { display: none; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen flex items-center justify-center relative overflow-hidden transition-colors duration-500">
+<body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-200 min-h-screen w-full flex items-center justify-center p-4 relative overflow-x-hidden transition-colors duration-500">
 
-    <!-- Wow Factor: Imaginary Glowing Orbs -->
-    <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary-500/20 dark:bg-primary-600/20 rounded-full blur-[100px] pointer-events-none animate-pulse-slow"></div>
-    <div class="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-amber-400/20 dark:bg-amber-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse-slow" style="animation-delay: 1.5s;"></div>
-    <div class="absolute top-[20%] left-[10%] w-[300px] h-[300px] bg-purple-500/10 dark:bg-purple-600/20 rounded-full blur-[80px] pointer-events-none animate-pulse-slow" style="animation-delay: 2.5s;"></div>
-    <div class="absolute bottom-[20%] right-[10%] w-[400px] h-[400px] bg-emerald-500/10 dark:bg-emerald-600/10 rounded-full blur-[90px] pointer-events-none animate-pulse-slow" style="animation-delay: 0.5s;"></div>
+    <!-- Glowing Background Orbs (محصورة داخل حاوية ثابتة تمنع تمدد الشاشة نهائياً) -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-20 -right-20 w-72 sm:w-96 h-72 sm:h-96 bg-primary-500/15 dark:bg-primary-600/15 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -left-20 w-72 sm:w-96 h-72 sm:h-96 bg-amber-400/15 dark:bg-amber-500/10 rounded-full blur-3xl"></div>
+    </div>
 
-    <!-- Theme Toggle Button -->
-    <button onclick="toggleDarkMode()" class="absolute top-6 left-6 z-50 w-12 h-12 rounded-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-slate-700/50 shadow-soft flex items-center justify-center text-slate-600 dark:text-amber-400 hover:scale-110 transition-all">
-        <i id="theme-icon" class="fa-solid fa-moon text-xl"></i>
+    <!-- Falling Autumn Leaves Effect (تأثير تساقط أوراق الخريف) -->
+    <div id="leaves-container" class="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true"></div>
+
+    <!-- Theme Toggle Button (مثبت دائماً في زاوية الشاشة العلوية اليسرى) -->
+    <button type="button" onclick="toggleDarkMode()" class="fixed top-4 left-4 z-50 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-md flex items-center justify-center text-slate-600 dark:text-amber-400 hover:scale-110 active:scale-95 transition-all focus:outline-none" aria-label="تبديل الوضع الليلي">
+        <i id="theme-icon" class="fa-solid fa-moon text-base sm:text-lg"></i>
     </button>
 
-    <div class="glass-panel p-8 md:p-10 rounded-3xl border border-white dark:border-slate-700 shadow-2xl w-full max-w-md relative z-10 mx-4 animate-slide-up">
+    <div class="glass-panel p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-white dark:border-slate-700 shadow-2xl w-full max-w-md mx-auto relative z-10 animate-slide-up bg-white/85 dark:bg-slate-900/85 backdrop-blur-md">
         
-        <div class="text-center mb-8 flex flex-col items-center justify-center">
-            <div class="mb-4">
-                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="شعار سكن بازرعة" class="w-52 h-auto mx-auto hover:scale-105 transition-transform duration-300">
+        <div class="text-center mb-6 sm:mb-8 flex flex-col items-center justify-center">
+            <div class="mb-3 sm:mb-4">
+                <img src="{{ url_for('static', filename='Images/logo.png') }}" alt="شعار سكن بازرعة" class="w-32 sm:w-44 h-auto mx-auto hover:scale-105 transition-transform duration-300">
             </div>
-            <h2 class="text-2xl font-bold text-slate-800 dark:text-white mt-2">نظام التحضير - سكن بازرعة للطالب الجامعي - العاصمة عدن</h2>
+            <h2 class="text-base sm:text-xl font-bold text-slate-800 dark:text-white mt-1 leading-snug">نظام التحضير - سكن بازرعة للطالب الجامعي - العاصمة عدن</h2>
         </div>
-        
 
-
-        <form action="/login" method="POST" class="space-y-5">
+        <form action="/login" method="POST" class="space-y-4 sm:space-y-5">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div>
-                <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">اسم المستخدم</label>
+                <label class="block text-xs sm:text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300">اسم المستخدم</label>
                 <div class="relative">
                     <input type="text" name="username" autocomplete="username" required 
-                           class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl py-3 pr-10 pl-4 outline-none focus:border-primary transition" 
+                           class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl py-2.5 sm:py-3 pr-10 pl-4 outline-none focus:border-primary transition text-sm text-slate-800 dark:text-slate-100" 
                            placeholder="أدخل اسم المستخدم">
-                    <i class="fa-solid fa-user absolute right-3 top-3.5 text-slate-400"></i>
+                    <i class="fa-solid fa-user absolute right-3 top-3 sm:top-3.5 text-slate-400"></i>
                 </div>
             </div>
             
             <div>
-                <label class="block text-sm font-bold mb-2 text-slate-700 dark:text-slate-300">كلمة المرور</label>
+                <label class="block text-xs sm:text-sm font-bold mb-1.5 text-slate-700 dark:text-slate-300">كلمة المرور</label>
                 <div class="relative">
                     <input type="password" id="password" name="password" autocomplete="current-password" required 
-                           class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl py-3 pr-10 pl-10 outline-none focus:border-primary transition font-mono" 
+                           class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl py-2.5 sm:py-3 pr-10 pl-10 outline-none focus:border-primary transition font-mono text-sm text-slate-800 dark:text-slate-100" 
                            placeholder="••••••••">
-                    <i class="fa-solid fa-lock absolute right-3 top-3.5 text-slate-400"></i>
+                    <i class="fa-solid fa-lock absolute right-3 top-3 sm:top-3.5 text-slate-400"></i>
                     
-                    <button type="button" onclick="togglePassword()" tabindex="-1" class="absolute left-3 top-3.5 text-slate-400 hover:text-primary transition focus:outline-none">
+                    <button type="button" onclick="togglePassword()" tabindex="-1" class="absolute left-3 top-3 sm:top-3.5 text-slate-400 hover:text-primary transition focus:outline-none" aria-label="إظهار كلمة المرور">
                         <i id="eyeIcon" class="fa-solid fa-eye"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="flex items-center text-sm pt-1">
+            <div class="flex items-center text-xs sm:text-sm pt-0.5">
                 <label class="flex items-center cursor-pointer text-slate-600 dark:text-slate-400 font-bold hover:text-primary transition select-none">
                     <input type="checkbox" name="remember" class="ml-2 accent-primary w-4 h-4 rounded">
                     تذكر بياناتي (إبقاء تسجيل الدخول)
                 </label>
             </div>
 
-            <button type="submit" class="w-full bg-primary hover:bg-primary-600 text-white py-3.5 rounded-xl font-bold transition shadow-lg shadow-primary-500/30 flex justify-center items-center gap-2 text-lg mt-2">
+            <button type="submit" class="w-full bg-primary hover:bg-primary-600 text-white py-3 sm:py-3.5 rounded-xl font-bold transition shadow-lg shadow-primary-500/30 flex justify-center items-center gap-2 text-base sm:text-lg mt-2 active:scale-95">
                 <span>دخول</span>
                 <i class="fa-solid fa-arrow-right-to-bracket"></i>
             </button>
@@ -162,6 +195,62 @@
                 }
             }, true);
         })();
+    </script>
+    <!-- سكريبت توليد أوراق الخريف الانسيابية ثلاثية الأبعاد -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('leaves-container');
+            if (!container) return;
+
+            const leafShapes = [
+                // ورقة شجر كلاسيكية (Birch/Beech)
+                `<svg viewBox="0 0 32 32" class="w-full h-full fill-current"><path d="M28.4 4.8c-7.9.6-15.6 5.2-19.1 11.8-2.6 4.9-2.3 10.4-2.3 10.4s5.5.3 10.4-2.3c6.6-3.5 11.2-11.2 11.8-19.1.1-1-.8-1.9-1.8-1.8zM14.9 20.7c-2.4 1.3-4.8 1.9-6.3 2.1.2-1.5.8-3.9 2.1-6.3 2.3-4.3 6.9-7.9 11.7-9.5-1.6 4.8-5.2 9.4-9.5 11.7z"/><path d="M7 27c-2 2-3 4-4 5h1c1-1 3-2 5-3l-2-2z"/></svg>`,
+                // ورقة قيقب خريفية (Maple leaf)
+                `<svg viewBox="0 0 24 24" class="w-full h-full fill-current"><path d="M12 2l1.2 4.2 3.8-2-1.2 4 4.2.4-3.2 2.6 3.2 3.8-4.8-.4.8 4.4-3.6-2.6-.6 4.6h-1.6l-.6-4.6-3.6 2.6.8-4.4-4.8.4 3.2-3.8-3.2-2.6 4.2-.4-1.2-4 3.8 2L12 2z"/></svg>`,
+                // ورقة بلوط مموجة (Oak leaf)
+                `<svg viewBox="0 0 24 24" class="w-full h-full fill-current"><path d="M19.5 9c-.3-1.4-1.3-2.5-2.7-2.7.1-.6 0-1.3-.3-1.9-.7-1.4-2.3-2.1-3.8-1.6-.5.2-1 .5-1.4.9-.7-.8-1.8-1.3-2.9-1.1C6.7 2.8 5.4 4.3 5.4 6c-.9.3-1.6.9-2 1.8-.7 1.4-.4 3.2.7 4.3-.4.8-.5 1.7-.2 2.6.4 1.2 1.5 2 2.8 2.1.1.7.5 1.4 1.1 1.9 1.1.9 2.7 1 3.9.3.2.5.5.9.9 1.2V23h1v-2.8c.4-.3.7-.7.9-1.2 1.2.7 2.8.6 3.9-.3.6-.5 1-1.2 1.1-1.9 1.3-.1 2.4-.9 2.8-2.1.3-.9.2-1.8-.2-2.6 1.1-1.1 1.4-2.9.7-4.3-.4-.9-1.1-1.5-2-1.8z"/></svg>`
+            ];
+
+            const autumnColors = [
+                '#f59e0b', // Amber ذهبي
+                '#ea580c', // Orange برتقالي
+                '#d97706', // Ochre عسلي خريفي
+                '#dc2626', // Red أحمر قرمزي
+                '#b45309', // Russet برونزي
+                '#eab308'  // Golden أصفر دافئ
+            ];
+
+            const leafCount = window.innerWidth < 640 ? 12 : 18;
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 0; i < leafCount; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'autumn-leaf';
+
+                const size = Math.floor(Math.random() * 16) + 18; // 18px إلى 34px
+                const left = (Math.random() * 94 + 3).toFixed(1); // 3% إلى 97%
+                const duration = (Math.random() * 6 + 9).toFixed(1); // 9s إلى 15s لحركة هادئة
+                const delay = (-Math.random() * 15).toFixed(1); // تبدأ الحركة فوراً دون انتظار
+                const swayX = (Math.random() * 40 + 25) * (Math.random() > 0.5 ? 1 : -1);
+                const opacity = (Math.random() * 0.35 + 0.45).toFixed(2);
+                const color = autumnColors[Math.floor(Math.random() * autumnColors.length)];
+                const shape = leafShapes[Math.floor(Math.random() * leafShapes.length)];
+
+                leaf.style.left = `${left}%`;
+                leaf.style.width = `${size}px`;
+                leaf.style.height = `${size}px`;
+                leaf.style.color = color;
+                leaf.style.animationDuration = `${duration}s`;
+                leaf.style.animationDelay = `${delay}s`;
+                leaf.style.setProperty('--sway-x', `${swayX}px`);
+                leaf.style.setProperty('--leaf-opacity', opacity);
+
+                leaf.innerHTML = shape;
+                fragment.appendChild(leaf);
+            }
+
+            container.appendChild(fragment);
+        });
     </script>
 </body>
 </html>

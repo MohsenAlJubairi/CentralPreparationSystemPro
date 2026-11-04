@@ -1,83 +1,85 @@
 {% extends "base.html" %}
 
 {% block title %}لوحة المطور - إدارة النظام{% endblock %}
-{% block header_title %}حسابات الإدارة <span class="text-sm font-normal text-slate-500">(صلاحيات المطور)</span>{% endblock %}
+{% block header_title %}حسابات الإدارة <span class="hidden sm:inline text-sm font-normal text-slate-500 mr-2">(صلاحيات المطور)</span>{% endblock %}
 
 {% block content %}
 
-
-<!-- نهاية منطقة عرض الرسائل -->
-<div class="mb-6 glass-panel p-6 rounded-2xl border border-purple-200 dark:border-purple-900/50 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 bg-gradient-to-l from-purple-50 to-transparent dark:from-purple-900/10">
+<div class="mb-5 sm:mb-6 glass-panel p-4 sm:p-6 rounded-2xl border border-purple-200 dark:border-purple-900/50 shadow-sm flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-gradient-to-l from-purple-50 to-transparent dark:from-purple-900/10">
     <div>
-        <h3 class="font-bold text-lg text-purple-800 dark:text-purple-300 flex items-center gap-2">
+        <h3 class="font-bold text-base sm:text-lg text-purple-800 dark:text-purple-300 flex items-center gap-2">
             <i class="fa-solid fa-database text-purple-500"></i> الإدارة المتقدمة لقواعد البيانات (Flask-Admin)
         </h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-bold">
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 font-bold">
             الوصول المباشر للتحكم الشامل في الجداول (الطلاب، الحسابات، التحضير، الإشعارات) بصلاحيات المطور المطلقة.
         </p>
     </div>
-    <a href="/dev_admin" target="_blank" class="shrink-0 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl font-extrabold transition-all shadow-lg shadow-purple-600/30 flex items-center gap-2 hover:-translate-y-1 active:scale-95">
-        فتح لوحة البيانات <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i>
+    <a href="/dev_admin" target="_blank" class="shrink-0 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-extrabold transition-all shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 hover:-translate-y-0.5 active:scale-95 text-sm">
+        فتح لوحة البيانات <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
     </a>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
     <!-- نموذج إضافة حساب جديد -->
-    <div class="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm md:col-span-1 h-fit">
-        <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white"><i class="fa-solid fa-user-plus text-amber-500 ml-2"></i>إضافة حساب جديد</h3>
-        <form action="{{ url_for('add_admin') }}" method="POST" class="space-y-4">
+    <div class="glass-panel p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm lg:col-span-1 h-fit bg-white dark:bg-slate-800">
+        <h3 class="font-bold text-base sm:text-lg mb-3 sm:mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-user-plus text-amber-500"></i> إضافة حساب جديد
+        </h3>
+        <form action="{{ url_for('add_admin') }}" method="POST" class="space-y-3 sm:space-y-4">
             <div>
-                <label class="block text-sm font-bold text-slate-500 mb-1">اسم المستخدم (للدخول)</label>
-                <input type="text" name="username" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg p-2 outline-none focus:border-amber-500" dir="ltr">
+                <label class="block text-xs sm:text-sm font-bold text-slate-500 mb-1">اسم المستخدم (للدخول)</label>
+                <input type="text" name="username" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-amber-500 text-sm" dir="ltr">
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-500 mb-1">نوع الصلاحية</label>
-                <select name="role" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg p-2 outline-none focus:border-amber-500 font-bold">
+                <label class="block text-xs sm:text-sm font-bold text-slate-500 mb-1">نوع الصلاحية</label>
+                <select name="role" required class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-amber-500 font-bold text-sm">
                     <option value="admin">مدير نظام (Admin)</option>
                     <option value="developer">مطور (Developer)</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-500 mb-1">كلمة المرور</label>
-                <input type="password" name="password" required minlength="6" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg p-2 outline-none focus:border-amber-500" dir="ltr">
+                <label class="block text-xs sm:text-sm font-bold text-slate-500 mb-1">كلمة المرور</label>
+                <input type="password" name="password" required minlength="6" class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-amber-500 text-sm" dir="ltr">
             </div>
-            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-lg transition shadow-lg shadow-amber-600/30">حفظ وإنشاء</button>
+            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 sm:py-3 rounded-xl transition shadow-lg shadow-amber-600/30 text-sm">حفظ وإنشاء</button>
         </form>
     </div>
 
     <!-- جدول عرض الحسابات الحالية -->
-    <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm md:col-span-2 overflow-hidden h-fit">
-        <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50">
-            <h3 class="font-bold text-slate-800 dark:text-white">قائمة الحسابات الإدارية</h3>
+    <div class="glass-panel rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm lg:col-span-2 overflow-hidden h-fit bg-white dark:bg-slate-800">
+        <div class="p-4 border-b border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 flex justify-between items-center">
+            <h3 class="font-bold text-base sm:text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-users-gear text-primary"></i> قائمة الحسابات الإدارية
+            </h3>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-right border-collapse">
-                <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 text-sm">
+        <div class="overflow-x-auto w-full">
+            <table class="w-full text-right border-collapse text-sm">
+                <thead class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 text-xs sm:text-sm">
                     <tr>
-                        <th class="p-4 font-bold">اسم المستخدم</th>
-                        <th class="p-4 font-bold text-center">الصلاحية</th>
-                        <th class="p-4 font-bold text-center">إجراءات</th>
+                        <th class="p-3 sm:p-4 font-bold whitespace-nowrap min-w-[140px]">اسم المستخدم</th>
+                        <th class="p-3 sm:p-4 font-bold text-center whitespace-nowrap">الصلاحية</th>
+                        <th class="p-3 sm:p-4 font-bold text-center whitespace-nowrap">إجراءات</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                     {% for admin in admins %}
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                        <td class="p-4 text-slate-800 dark:text-slate-200 font-bold font-mono text-sm" dir="ltr">{{ admin.username }}</td>
-                        <td class="p-4 text-center">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                        <td class="p-3 sm:p-4 text-slate-800 dark:text-slate-200 font-bold font-mono text-xs sm:text-sm whitespace-nowrap" dir="ltr">{{ admin.username }}</td>
+                        <td class="p-3 sm:p-4 text-center whitespace-nowrap">
                             {% if admin.role == 'developer' %}
-                                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 px-3 py-1 rounded-md text-xs font-bold border border-purple-200 dark:border-purple-800/50">مطور</span>
+                                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 px-2.5 py-1 rounded-md text-xs font-bold border border-purple-200 dark:border-purple-800/50">مطور</span>
                             {% else %}
-                                <span class="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-3 py-1 rounded-md text-xs font-bold border border-primary-200 dark:border-primary-800/50">مدير</span>
+                                <span class="bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 px-2.5 py-1 rounded-md text-xs font-bold border border-primary-200 dark:border-primary-800/50">مدير</span>
                             {% endif %}
                         </td>
-                        <td class="p-4 text-center">
-                            <div class="flex items-center justify-center gap-2">
-                                <button onclick="openEditModal('{{ admin.id }}', '{{ admin.username }}', '{{ admin.role }}')" class="bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-primary-600 hover:text-white transition" title="تعديل">
+                        <td class="p-3 sm:p-4 text-center whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-1.5 sm:gap-2">
+                                <button onclick="openEditModal('{{ admin.id }}', '{{ admin.username }}', '{{ admin.role }}')" class="bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold hover:bg-primary-600 hover:text-white transition" title="تعديل">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
                                 
-                                <!-- زر الحذف مدمج داخل نموذج (Form) لضمان الأمان -->
                                 <form action="{{ url_for('delete_admin', admin_id=admin.id) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذا الحساب نهائياً؟');" class="inline">
-                                    <button type="submit" class="bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-rose-600 hover:text-white transition" title="حذف">
+                                    <button type="submit" class="bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold hover:bg-rose-600 hover:text-white transition" title="حذف">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
@@ -92,29 +94,34 @@
 </div>
 
 <!-- نافذة التعديل المنبثقة -->
-<div id="editAdminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center">
-    <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<div id="editAdminModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 justify-center items-center p-4">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden max-h-[90vh] overflow-y-auto">
         <div class="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-800">
-            <h3 class="font-bold text-lg text-slate-800 dark:text-white">تعديل بيانات الحساب</h3>
-            <button onclick="closeEditModal()" class="text-rose-500 hover:scale-110 transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 class="font-bold text-base sm:text-lg text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square"></i> تعديل بيانات الحساب
+            </h3>
+            <button onclick="closeEditModal()" class="text-rose-500 hover:scale-110 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
-        <form id="editAdminForm" method="POST" class="p-6 space-y-4">
+        <form id="editAdminForm" method="POST" class="p-5 space-y-4">
             <div>
-                <label class="block text-sm font-bold text-slate-500 mb-1">اسم المستخدم</label>
-                <input type="text" id="editUsername" name="username" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg p-2 outline-none focus:border-amber-500" dir="ltr">
+                <label class="block text-xs sm:text-sm font-bold text-slate-500 mb-1">اسم المستخدم</label>
+                <input type="text" id="editUsername" name="username" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-amber-500 font-mono text-sm" dir="ltr">
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-500 mb-1">نوع الصلاحية</label>
-                <select id="editRole" name="role" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg p-2 outline-none focus:border-amber-500 font-bold">
+                <label class="block text-xs sm:text-sm font-bold text-slate-500 mb-1">نوع الصلاحية</label>
+                <select id="editRole" name="role" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-amber-500 font-bold text-sm">
                     <option value="admin">مدير نظام (Admin)</option>
                     <option value="developer">مطور (Developer)</option>
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-bold text-slate-500 mb-1">كلمة المرور الجديدة (اختياري)</label>
-                <input type="text" name="password" placeholder="اتركه فارغاً لعدم التغيير" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-lg p-2 outline-none focus:border-amber-500" dir="ltr">
+                <label class="block text-xs sm:text-sm font-bold text-slate-500 mb-1">كلمة المرور الجديدة (اختياري)</label>
+                <input type="password" name="password" minlength="6" placeholder="اتركه فارغاً للإبقاء على الحالية" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl p-2.5 outline-none focus:border-amber-500 text-sm" dir="ltr">
             </div>
-            <button type="submit" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 rounded-lg transition shadow-lg shadow-primary-600/30">حفظ التعديلات</button>
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold py-2.5 rounded-xl transition text-sm">حفظ التعديلات</button>
+                <button type="button" onclick="closeEditModal()" class="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold py-2.5 rounded-xl hover:bg-slate-200 transition text-sm">إلغاء</button>
+            </div>
         </form>
     </div>
 </div>
@@ -122,18 +129,19 @@
 
 {% block scripts %}
 <script>
-    // تحديث دالة فتح النافذة لتشمل قراءة الصلاحية الجديدة
     function openEditModal(id, username, role) {
         document.getElementById('editAdminForm').action = '/edit_admin/' + id;
         document.getElementById('editUsername').value = username;
-        document.getElementById('editRole').value = role; // تحديد الصلاحية تلقائياً
-        document.getElementById('editAdminModal').classList.remove('hidden');
-        document.getElementById('editAdminModal').classList.add('flex');
+        document.getElementById('editRole').value = role;
+        const modal = document.getElementById('editAdminModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
     }
 
     function closeEditModal() {
-        document.getElementById('editAdminModal').classList.add('hidden');
-        document.getElementById('editAdminModal').classList.remove('flex');
+        const modal = document.getElementById('editAdminModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
     }
 </script>
 {% endblock %}

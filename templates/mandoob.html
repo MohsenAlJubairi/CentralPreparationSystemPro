@@ -6,7 +6,7 @@
     <title>لوحة المندوب - التحضير اليومي</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3.0">
     <style>
         body { font-family: 'Tajawal', sans-serif; }
         /* إخفاء شريط التمرير للحفاظ على نظافة التصميم */
@@ -28,14 +28,12 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Service Worker Failed', err));
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
             });
         }
     </script>
 
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=3.0"></script>
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
@@ -51,7 +49,7 @@
         <i id="theme-icon" class="fa-solid fa-moon text-xl"></i>
     </button>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
 
 
 
@@ -89,48 +87,48 @@
         </div>
     </div>
 
-    <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/20 dark:border-slate-700 mb-8 overflow-hidden">
-    <div class="flex justify-between items-center mb-6">
-        <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-            <i class="fa-solid text-orange-500 animate-pulse"></i>
-            سلسلة الانضباط
-        </h3>
-        <span class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-3 py-1 rounded-full">
-            تحديث تلقائي 6:00 AM
-        </span>
-    </div>
-
-    <div class="flex justify-between items-center gap-2 md:gap-4">
-        {% for day in week_stats %}
-        <div class="flex flex-col items-center gap-3 flex-1">
-            <div class="relative group">
-                {% if day.status == 'attended' %}
-                    <div class="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg shadow-yellow-200 border-4 border-yellow-200 transform group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-check text-white text-xl md:text-2xl"></i>
-                    </div>
-                {% elif day.status == 'missed' %}
-                    <div class="w-12 h-12 md:w-16 md:h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg shadow-red-200 border-4 border-red-200 transform group-hover:scale-110 transition-transform">
-                        <i class="fa-solid fa-xmark text-white text-xl md:text-2xl"></i>
-                    </div>
-                {% elif day.status == 'pending' %}
-                    <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-100 rounded-full flex items-center justify-center border-4 border-dashed border-slate-300 animate-pulse">
-                        <i class="fa-solid fa-bolt text-slate-400 text-xl md:text-2xl"></i>
-                    </div>
-                {% else %}
-                    <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 rounded-full flex items-center justify-center border-4 border-slate-100">
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="text-center">
-                <p class="text-[10px] md:text-xs font-bold {{ 'text-emerald-600' if day.day == 'اليوم' else 'text-slate-600' }}">
-                    {{ day.day }}
-                </p>
-                <p class="text-[8px] md:text-[10px] text-slate-400 font-medium">{{ day.date }}</p>
-            </div>
+    <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/20 dark:border-slate-700 mb-4 overflow-hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                <i class="fa-solid text-orange-500 animate-pulse"></i>
+                سلسلة الانضباط
+            </h3>
+            <span class="text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-3 py-1 rounded-full">
+                تحديث تلقائي 6:00 AM
+            </span>
         </div>
-        {% endfor %}
-    </div>
+
+        <div class="flex justify-between items-center gap-2 md:gap-4">
+            {% for day in week_stats %}
+            <div class="flex flex-col items-center gap-3 flex-1">
+                <div class="relative group">
+                    {% if day.status == 'attended' %}
+                        <div class="w-12 h-12 md:w-16 md:h-16 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg shadow-yellow-200 border-4 border-yellow-200 transform group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-check text-white text-xl md:text-2xl"></i>
+                        </div>
+                    {% elif day.status == 'missed' %}
+                        <div class="w-12 h-12 md:w-16 md:h-16 bg-red-500 rounded-full flex items-center justify-center shadow-lg shadow-red-200 border-4 border-red-200 transform group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-xmark text-white text-xl md:text-2xl"></i>
+                        </div>
+                    {% elif day.status == 'pending' %}
+                        <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-100 rounded-full flex items-center justify-center border-4 border-dashed border-slate-300 animate-pulse">
+                            <i class="fa-solid fa-bolt text-slate-400 text-xl md:text-2xl"></i>
+                        </div>
+                    {% else %}
+                        <div class="w-12 h-12 md:w-16 md:h-16 bg-slate-50 rounded-full flex items-center justify-center border-4 border-slate-100">
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-[10px] md:text-xs font-bold {{ 'text-emerald-600' if day.day == 'اليوم' else 'text-slate-600' }}">
+                        {{ day.day }}
+                    </p>
+                    <p class="text-[8px] md:text-[10px] text-slate-400 font-medium">{{ day.date }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 
     {% if already_recorded %}
@@ -161,12 +159,12 @@
         </div>
         
     {% else %}
-        <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in space-y-4 pb-32">
+        <form id="attendanceForm" action="{{ url_for('submit_attendance') }}" method="POST" {% if already_recorded %}style="display: none;"{% endif %} class="fade-in pb-32">
             <!-- CSRF Token للحماية من الأخطاء -->
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             {% if allow_date_change %}
-                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
                     <div class="flex items-center gap-2 text-amber-700 font-bold">
                         <i class="fa-solid fa-calendar-day text-xl"></i>
                         <span>وضع تعديل التاريخ مفعل:</span>
@@ -176,26 +174,6 @@
             {% else %}
                 <input type="hidden" name="record_date" value="{{ today.strftime('%Y-%m-%d') }}">
             {% endif %}
-
-            <!-- إضافة ميزة الملاحظة العامة -->
-            <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-5 mb-6 shadow-sm relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-100/50 to-transparent dark:from-blue-800/30 w-0 group-focus-within:w-full transition-all duration-700 ease-out"></div>
-                <div class="relative z-10 flex flex-col md:flex-row gap-4 items-start md:items-center">
-                    <div class="w-12 h-12 shrink-0 rounded-full bg-blue-100 dark:bg-blue-800 text-blue-600 dark:text-blue-300 flex items-center justify-center text-xl shadow-inner border-2 border-white dark:border-slate-800">
-                        <i class="fa-solid fa-bullhorn group-focus-within:-rotate-12 transition-transform"></i>
-                    </div>
-                    <div class="flex-1 w-full">
-                        <h3 class="font-bold text-lg text-blue-800 dark:text-blue-300 mb-1">تعميم ملاحظة (للجميع)</h3>
-                        <p class="text-xs text-blue-600/80 dark:text-blue-400 font-bold mb-3">اكتب هنا لتنسخ الملاحظة لجميع طلاب الشقة تلقائياً دفعة واحدة.</p>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none">
-                                <i class="fa-solid fa-pen-to-square text-blue-400"></i>
-                            </div>
-                            <input type="text" id="globalNoteInput" oninput="syncGlobalNote(this.value)" placeholder="اكتب ملاحظتك العامة هنا..." class="bg-white dark:bg-slate-800 border-2 border-blue-200 dark:border-blue-700 text-slate-800 dark:text-slate-200 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 block w-full pr-12 p-3 font-bold outline-none transition-all shadow-sm placeholder-slate-400">
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="grid grid-cols-1 gap-4">
 
@@ -234,28 +212,28 @@
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-4 gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                        <div class="grid grid-cols-4 gap-1.5 sm:gap-2 bg-slate-50 dark:bg-slate-700/50 p-1.5 rounded-xl border border-slate-100 dark:border-slate-600">
                             <div class="relative">
                                 <input type="radio" id="present_{{ student.id }}" name="student_{{ student.id }}" value="حاضر" required {% if current_status == 'حاضر' %}checked{% endif %} class="peer hidden">
-                                <label for="present_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                <label for="present_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-300 peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
                                     حاضر
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="radio" id="absent_{{ student.id }}" name="student_{{ student.id }}" value="غائب" required {% if current_status == 'غائب' %}checked{% endif %} class="peer hidden">
-                                <label for="absent_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                <label for="absent_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-300 peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
                                     غائب
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="radio" id="excused_{{ student.id }}" name="student_{{ student.id }}" value="مستأذن" required {% if current_status == 'مستأذن' %}checked{% endif %} class="peer hidden">
-                                <label for="excused_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                <label for="excused_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-300 peer-checked:bg-amber-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
                                     مستأذن
                                 </label>
                             </div>
                             <div class="relative">
                                 <input type="radio" id="leave_{{ student.id }}" name="student_{{ student.id }}" value="مأجز" required {% if current_status == 'مأجز' %}checked{% endif %} class="peer hidden">
-                                <label for="leave_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-sm font-bold text-slate-500 peer-checked:bg-purple-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
+                                <label for="leave_{{ student.id }}" class="block text-center cursor-pointer py-2 rounded-lg text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-300 peer-checked:bg-purple-500 peer-checked:text-white peer-checked:shadow-md transition-all duration-200">
                                     مأجز
                                 </label>
                             </div>
@@ -327,24 +305,6 @@
         }, 50);
     }
 
-    // مزامنة الملاحظة العامة مع جميع الطلاب
-    function syncGlobalNote(value) {
-        // البحث عن جميع حقول الملاحظات للطلاب
-        const noteInputs = document.querySelectorAll('input[name^="note_"]');
-        noteInputs.forEach(input => {
-            input.value = value;
-            
-            // إظهار حقل الملاحظة للطالب إذا لم يكن ظاهراً وكان هناك نص مكتوب
-            const containerId = input.name.replace('note_', 'note_container_');
-            const container = document.getElementById(containerId);
-            if (container) {
-                if (value.trim() !== '') {
-                    container.style.display = 'block';
-                }
-            }
-        });
-    }
-
     // إظهار/إخفاء حقل الملاحظة بشكل ناعم
     function toggleNote(studentId) {
         const container = document.getElementById('note_container_' + studentId);
@@ -377,9 +337,9 @@
         if ('serviceWorker' in navigator && 'PushManager' in window) {
             try {
                 await navigator.serviceWorker.register('/sw.js');
-                console.log("تم التحقق من نظام الإشعارات في المتصفح بنجاح.");
+                // تم التحقق
             } catch (error) {
-                console.error("خطأ أثناء تسجيل عامل الخدمة:", error);
+                // error handled
             }
         }
     }
@@ -411,7 +371,7 @@
                 }
 
             } catch (error) {
-                console.error('فشل تفعيل الإشعارات:', error);
+                // error handled
                 alert('حدث خطأ: تأكد أنك سمحت للإشعارات من إعدادات المتصفح.');
             }
         } else {
@@ -439,7 +399,7 @@
                     alert('حدث خطأ أثناء الحذف من السيرفر.');
                 }
             } catch (error) {
-                console.error('فشل إلغاء الاشتراك:', error);
+                // error handled
             }
         }
     }

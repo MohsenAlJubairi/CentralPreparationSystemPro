@@ -1,15 +1,14 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash , jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import db, User, Student, Attendance, PushSubscription
 from datetime import date, datetime, timedelta, timezone
-from io import BytesIO
+from pywebpush import webpush, WebPushException
 from urllib.parse import urlparse, urljoin
 from sqlalchemy.exc import IntegrityError
+from io import BytesIO
 import json
 import os
-from flask import jsonify
-from pywebpush import webpush, WebPushException
 # =========================================================================
 # دوال مساعدة للأمان والتكوين
 # =========================================================================
