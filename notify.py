@@ -5,20 +5,27 @@ from datetime import datetime, timedelta, timezone
 def check_and_notify():
     # 1. الدخول في سياق التطبيق لكي نتمكن من قراءة قاعدة البيانات
     with app.app_context():
-        # 2. حساب التاريخ المنطقي (كما فعلنا في الموقع)
+        # 2. حساب التاريخ المنطقي (كما في الموقع)
         yemen_tz = timezone(timedelta(hours=3))
         now_in_yemen = datetime.now(yemen_tz)
-        logical_today = (now_in_yemen - timedelta(hours=3)).date()
+        logical_today = (now_in_yemen - timedelta(hours=6)).date()
         
         # 3. جلب جميع المناديب النشطين
         active_mandoobs = User.query.filter_by(role='mandoob', is_active=True).all()
         
-        # 4. جلب معرفات المناديب الذين قاموا بالتحضير اليوم
-        submitted_records = Attendance.query.filter_by(date=logical_today).all()
-        submitted_mandoob_ids = {record.recorded_by for record in submitted_records}
+        # 4. جلب أرقام الشقق التي تم تحضير طلابها اليوم (سواء من المندوب أو الإدارة)
+        prepared_apartments = set(
+            row[0] for row in db.session.query(Student.apartment_number)
+            .join(Attendance, Attendance.student_id == Student.id)
+            .filter(Attendance.date == logical_today)
+            .distinct().all()
+        )
         
-        # 5. استخراج المناديب الذين لم يحضروا
-        lazy_mandoobs = [m for m in active_mandoobs if m.id not in submitted_mandoob_ids]
+        # 5. استخراج المناديب الذين لم يتم تحضير شققهم اليوم
+        lazy_mandoobs = [
+            m for m in active_mandoobs 
+            if m.student and m.student.apartment_number not in prepared_apartments
+        ]
         
         if not lazy_mandoobs:
             print("الجميع قام بالتحضير، لا يوجد متأخرين!")

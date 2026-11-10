@@ -764,6 +764,7 @@ def register_routes(app, limiter=None, csrf=None):
             Student.apartment_number == apt_num,
             Student.status.in_(['فعال', 'نشط', 'موجود', 'في إجازة', 'مستأذن', 'غائب', 'حاضر', 'مأجز'])
         ).order_by(Student.room_number).all()
+        student_ids = [s.id for s in students]
         
        # حساب توقيت اليمن (UTC+3)
         yemen_tz = timezone(timedelta(hours=3))
@@ -776,25 +777,31 @@ def register_routes(app, limiter=None, csrf=None):
         logical_today = (now_in_yemen - timedelta(hours=6)).date()
         
 
-        # 2. بناء بيانات "تقويم الحماسة" (آخر 7 أيام)
+        # 2. بناء بيانات "سلسلة الانضباط" للشقة (آخر 7 أيام)
         week_stats = []
         arabic_days = ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد']
         
+        # جلب تواريخ الأيام التي تم تحضير طلاب هذه الشقة فيها (سواء من المندوب الحالي أو السابق أو المدير)
+        start_of_week = logical_today - timedelta(days=6)
+        attended_dates = set()
+        if student_ids:
+            records_dates = db.session.query(Attendance.date).filter(
+                Attendance.student_id.in_(student_ids),
+                Attendance.date >= start_of_week,
+                Attendance.date <= logical_today
+            ).distinct().all()
+            attended_dates = {d[0] for d in records_dates}
+        
         for i in range(6, -1, -1): # من 6 أيام مضت وصولاً إلى اليوم
             target_date = logical_today - timedelta(days=i)
-            
-            # البحث عن تحضير في هذا التاريخ لهذا المندوب
-            record = Attendance.query.filter_by(recorded_by=current_user.id, date=target_date).first()
-            
             day_name = "اليوم" if i == 0 else arabic_days[target_date.weekday()]
             
-            status = 'future'
-            if record:
-                status = 'attended' # دائرة صفراء
+            if target_date in attended_dates:
+                status = 'attended' # دائرة صفراء / تم التحضير
             elif target_date < logical_today:
-                status = 'missed'   # دائرة حمراء
-            elif i == 0:
-                status = 'pending'  # لم يحضر اليوم بعد
+                status = 'missed'   # دائرة حمراء / لم يتم التحضير
+            else: # اليوم الحالي ولم يُحضر بعد
+                status = 'pending'
                 
             week_stats.append({
                 'day': day_name,
@@ -802,10 +809,16 @@ def register_routes(app, limiter=None, csrf=None):
                 'date': target_date.strftime('%d/%m')
             })
 
+        # جلب سجلات تحضير طلاب الشقة لليوم الحالي (سواء سجلها المندوب الحالي أو السابق أو الإدارة)
+        existing_records = []
+        if student_ids:
+            existing_records = Attendance.query.filter(
+                Attendance.student_id.in_(student_ids),
+                Attendance.date == logical_today
+            ).all()
 
-        # لاحظ هنا استخدمنا logical_today بدلاً من today
-        existing_records = Attendance.query.filter_by(recorded_by=current_user.id, date=logical_today).all()
         att_dict = {r.student_id: r.status for r in existing_records}
+        att_dict_notes = {r.student_id: (r.note or '') for r in existing_records}
         
         already_recorded = len(existing_records) > 0
         allow_date = get_setting('ALLOW_DATE_CHANGE', False)
@@ -820,6 +833,7 @@ def register_routes(app, limiter=None, csrf=None):
                                apt_num=apt_num, 
                                already_recorded=already_recorded,
                                att_dict=att_dict,
+                               att_dict_notes=att_dict_notes,
                                today=logical_today, # نمرر التاريخ المنطقي للواجهة
                                allow_date_change=allow_date,
                                is_allowed_time=is_allowed_time,
@@ -974,14 +988,22 @@ def register_routes(app, limiter=None, csrf=None):
         # 2. حساب التاريخ المنطقي
         yemen_tz = timezone(timedelta(hours=3))
         now_in_yemen = datetime.now(yemen_tz)
-        logical_today = (now_in_yemen - timedelta(hours=3)).date()
+        logical_today = (now_in_yemen - timedelta(hours=6)).date()
         
-        # 3. جلب المناديب المتأخرين
+        # 3. جلب المناديب المتأخرين للشقق التي لم يتم تحضيرها اليوم
         active_mandoobs = User.query.filter_by(role='mandoob', is_active=True).all()
-        submitted_records = Attendance.query.filter_by(date=logical_today).all()
-        submitted_mandoob_ids = {record.recorded_by for record in submitted_records}
         
-        lazy_mandoobs = [m for m in active_mandoobs if m.id not in submitted_mandoob_ids]
+        prepared_apartments = set(
+            row[0] for row in db.session.query(Student.apartment_number)
+            .join(Attendance, Attendance.student_id == Student.id)
+            .filter(Attendance.date == logical_today)
+            .distinct().all()
+        )
+        
+        lazy_mandoobs = [
+            m for m in active_mandoobs 
+            if m.student and m.student.apartment_number not in prepared_apartments
+        ]
         
         if not lazy_mandoobs:
             return "تم فحص النظام: الجميع قام بالتحضير.", 200
